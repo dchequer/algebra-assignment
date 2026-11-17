@@ -1,0 +1,4 @@
+PWD /home/diego/uofl/cse625/repos/forks/algebra-assignment/report
+INPUT /etc/texmf/web2c/texmf.cnf
+INPUT /usr/share/texmf/web2c/texmf.cnf
+INPUT /usr/share/texlive/texmf-dist/web2c/texmf.cnf

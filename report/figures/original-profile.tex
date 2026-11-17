@@ -1,0 +1,37 @@
+\documentclass[12pt,border=3pt]{standalone}
+\usepackage{mathptmx}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
+\begin{document}
+\begin{tikzpicture}
+\begin{axis}[
+    xbar,
+    width=9cm,
+    height=7.2cm,
+    font=\small,
+    xmin=0,
+    xmax=65,
+    xtick={0,10,20,30,40,50,60},
+    xlabel={Share of sampled self time (\%)},
+    ytick={0,1,2,3,4},
+    yticklabels={Matrix multiplication,Determinants (self),Polynomial divmod,Reported \_init symbol,RNG state refresh},
+    y dir=reverse,
+    ymin=-0.5,
+    ymax=4.5,
+    enlarge y limits=false,
+    bar width=14pt,
+    axis x line=bottom,
+    axis y line=left,
+    xmajorgrids=true,
+    grid style={gray!20},
+    tick align=outside,
+    nodes near coords={\pgfmathprintnumber[fixed,precision=2,fixed zerofill]{\pgfplotspointmeta}\%},
+    nodes near coords align={horizontal},
+    every node near coord/.append style={font=\small},
+]
+\addplot[fill=blue!60!black,draw=none]
+    table[x=percent_self,y expr=\coordindex,col sep=comma]
+    {../../results/original/profile-hotspots.csv};
+\end{axis}
+\end{tikzpicture}
+\end{document}
