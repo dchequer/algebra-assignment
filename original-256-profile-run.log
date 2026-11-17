@@ -1,0 +1,23 @@
+Matrix dimension 256
+Seed 123456
+Field order 1331
+Modulus 4 + 1*x^1 + 1*x^3
+Generating A and B
+Generation seconds 0.010329
+Computing C = A * B
+Product seconds 4.358203
+Computing det(A)
+det(A) = 1 + 1*x^1 + 6*x^2
+Coefficients [1, 1, 6]
+Seconds 1.495948
+Computing det(B)
+det(B) = 2 + 7*x^1 + 7*x^2
+Coefficients [2, 7, 7]
+Seconds 1.498118
+Computing det(C)
+det(C) = 4 + 1*x^1 + 6*x^2
+Coefficients [4, 1, 6]
+Seconds 1.491347
+det(A) * det(B) = 4 + 1*x^1 + 6*x^2
+Identity verified true
+Total seconds 8.854222

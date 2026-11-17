@@ -1,0 +1,4 @@
+matrix_size,runs,median_wall_seconds,min_wall_seconds,max_wall_seconds,median_app_total_seconds,min_app_total_seconds,max_app_total_seconds,median_generation_seconds,median_product_seconds,median_det_a_seconds,median_det_b_seconds,median_det_c_seconds,median_det_sum_seconds,max_rss_kib,max_rss_mib
+64,3,0.15,0.15,0.15,0.151263,0.147525,0.151736,0.003087,0.079659,0.022747,0.022998,0.022782,0.068579,4796,4.683594
+128,3,1.10,1.10,1.11,1.102611,1.098483,1.110965,0.010703,0.546825,0.179399,0.180532,0.180053,0.540658,7292,7.121094
+256,3,8.73,8.64,8.73,8.728325,8.640466,8.730073,0.018557,4.418723,1.414259,1.419281,1.421153,4.273438,18060,17.636719

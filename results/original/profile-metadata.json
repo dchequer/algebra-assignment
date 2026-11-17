@@ -1,0 +1,38 @@
+{
+  "analysis_date": "2026-11-17",
+  "profiler": "GNU gprof (GNU Binutils for Debian) 2.44",
+  "matrix_size": 256,
+  "seed": 123456,
+  "input_files": [
+    "original-256-profile.txt",
+    "original-256-profile-run.log",
+    "gmon.out"
+  ],
+  "compile_flags": "-O3 -DNDEBUG -std=gnu++20 -pg -g",
+  "link_profile_flag": "-pg",
+  "sample_interval_seconds": 0.01,
+  "recorded_self_seconds": 6.68,
+  "instrumented_application_total_seconds": 8.854222,
+  "identity_verified": true,
+  "baseline_data": "results/original/summary.csv: nine separate non-instrumented benchmark runs",
+  "statistics": "Reported flat-profile self percentages and times are preserved without renormalizing. Printed percentages sum to 100.03 because of rounding.",
+  "important_counts": {
+    "polynomial_divmod": 50233382,
+    "determinant": 3,
+    "field_reciprocal": 767,
+    "out_of_line_field_multiply": 1
+  },
+  "interpretation": [
+    "Self time excludes separately reported callees but includes code inlined into the attributed function.",
+    "The optimized matrix product contains 256^3 = 16777216 element multiplication requests at source level; the field multiply symbol's count is not the total number of such requests.",
+    "A zero sampled self time does not establish that a called function costs nothing.",
+    "The graph shows sampled self-time shares, not shares of wall-clock time or expected cache speedups.",
+    "The existing temporary profiling flags must be removed before collecting ordinary benchmark timings."
+  ],
+  "figure": "report/figures/original-profile.pdf",
+  "sources": {
+    "flat_profile": "https://sourceware.org/binutils/docs/gprof/Flat-Profile.html",
+    "sampling": "https://sourceware.org/binutils/docs/gprof/Sampling-Error.html",
+    "inlining": "https://gcc.gnu.org/onlinedocs/gcc/Inline.html"
+  }
+}

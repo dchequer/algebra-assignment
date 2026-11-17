@@ -1,0 +1,119 @@
+{
+  "analysis_date": "2026-11-17",
+  "implementation": "Original finite field arithmetic, after extracting the determinant into a shared header",
+  "host": {
+    "hostname": "louie",
+    "logical_cpus": 4,
+    "reported_cpu_model": "12th Gen Intel(R) Core(TM) i3-12100F",
+    "hypervisor": "KVM",
+    "total_memory_approx_gib": 15
+  },
+  "build": {
+    "type": "Release",
+    "compiler": "GNU g++ 14.2.0",
+    "compiler_path": "/usr/bin/g++",
+    "cmake_version": "3.31.6",
+    "observed_cxx_flags": "-O3 -DNDEBUG -std=gnu++20",
+    "final_configured_matrix_size": 256,
+    "runtime": "One sequential process; --parallel was used for compilation only"
+  },
+  "source": {
+    "base_commit": "bf23e3bc34e968a51394d176186d708aa4fcd598",
+    "working_tree_has_local_changes": true,
+    "note": "The base commit alone does not identify the extracted header and other uncommitted changes used for these runs.",
+    "finite_fields_commit": "74b3d569fb48818f4c10f3c32889f2128485f1a7",
+    "matrices_commit": "84abddac26d2805072efcb1c44bbe7faac45fa6b"
+  },
+  "field": {
+    "characteristic": 11,
+    "extension_degree": 3,
+    "cardinality": 1331,
+    "modulus_coefficients": [
+      4,
+      1,
+      0,
+      1
+    ],
+    "seed": 123456
+  },
+  "recorded_user_procedure": {
+    "build_example": "cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DALGEBRA_ASSIGNMENT_SIZE=256 && cmake --build build --parallel",
+    "measurement_example": "/usr/bin/time -v ./build/src/algebra_determinants 2>&1 | tee original-256-run1.log",
+    "substitutions": "Matrix sizes 64, 128, and 256; run indices 1, 2, and 3. Build once for each size, then collect three separate process executions."
+  },
+  "measurement": {
+    "source_logs": "Repository-root original-<matrix_size>-run<run>.log files, named in runs.csv.",
+    "compile_time_included": false,
+    "repeats_per_size": 3,
+    "wall_seconds": "GNU Time elapsed wall-clock seconds, recorded to hundredths.",
+    "app_total_seconds": "Application steady-clock total; a different timing boundary from GNU Time wall time.",
+    "phase_seconds": "Application-reported generation, product, and individual determinant times.",
+    "det_sum_seconds": "Sum of the three determinant phase times within one run.",
+    "rss_units": "KiB, from GNU Time Maximum resident set size (kbytes) on Linux.",
+    "summary": "Median of each timing column independently; maximum peak RSS across the three runs. median_det_sum_seconds is the median of per-run sums, not the sum of phase medians.",
+    "memory_conversion": "max_rss_mib = max_rss_kib / 1024",
+    "limits": "Three measured sizes and three runs each; no function-level profiler data has been collected."
+  },
+  "validation": {
+    "logs": 9,
+    "all_identity_checks_passed": true,
+    "all_exit_statuses_zero": true,
+    "determinant_coefficients_consistent_within_each_size": true
+  },
+  "determinants": [
+    {
+      "matrix_size": 64,
+      "A": [
+        3,
+        7,
+        9
+      ],
+      "B": [
+        10,
+        2,
+        2
+      ],
+      "C": [
+        1,
+        5,
+        4
+      ]
+    },
+    {
+      "matrix_size": 128,
+      "A": [
+        3,
+        7,
+        4
+      ],
+      "B": [
+        5,
+        7,
+        6
+      ],
+      "C": [
+        10,
+        0,
+        8
+      ]
+    },
+    {
+      "matrix_size": 256,
+      "A": [
+        1,
+        1,
+        6
+      ],
+      "B": [
+        2,
+        7,
+        7
+      ],
+      "C": [
+        4,
+        1,
+        6
+      ]
+    }
+  ]
+}

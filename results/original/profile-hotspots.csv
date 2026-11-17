@@ -1,0 +1,6 @@
+label,percent_self,self_seconds,calls
+Matrix multiplication,49.71,3.32,1
+Determinants (self),35.19,2.35,3
+Polynomial divmod,12.13,0.81,50233382
+Reported _init symbol,2.55,0.17,
+RNG state refresh,0.45,0.03,631
