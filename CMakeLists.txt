@@ -8,3 +8,8 @@ endif()
 
 include(cmake/Dependencies.cmake)
 add_subdirectory(src)
+
+include(CTest)
+if(BUILD_TESTING)
+    add_subdirectory(tests)
+endif()
