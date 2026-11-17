@@ -25,6 +25,11 @@ class CacheState {
     std::vector<std::uint16_t> addition_results;
     std::size_t addition_misses = 0;
 
+    std::vector<std::uint16_t> negation_results;
+    std::vector<std::uint16_t> reciprocal_results;
+    std::size_t negation_misses = 0;
+    std::size_t reciprocal_misses = 0;
+
    public:
     using OriginalFieldType = OriginalField;
 
@@ -40,6 +45,9 @@ class CacheState {
         multiplication_results.assign(Q * Q, EMPTY);
 
         addition_results.assign(Q * Q, EMPTY);
+
+        negation_results.assign(Q, EMPTY);
+        reciprocal_results.assign(Q, EMPTY);
     }
 
     std::size_t size() const {
@@ -105,6 +113,56 @@ class CacheState {
 
     std::size_t addition_miss_count() const {
         return addition_misses;
+    }
+
+    std::uint16_t negate_id(std::uint16_t id) {
+        const std::size_t Q = elements_.size();
+
+        if (id >= Q) {
+            throw std::out_of_range("CacheState: negate_id: id exceeds field cardinality");
+        }
+
+        std::uint16_t result_id = negation_results[id];
+
+        // cache miss
+        if (result_id == EMPTY) {
+            const auto& element = elements_[id];
+            const auto negated = element.negate();
+            result_id = encode<OriginalField>(negated);
+            negation_results[id] = result_id;
+            ++negation_misses;
+        }
+
+        return result_id;
+    };
+
+    std::uint16_t reciprocal_id(std::uint16_t id) {
+        const std::size_t Q = elements_.size();
+
+        if (id >= Q) {
+            throw std::out_of_range("CacheState: reciprocal_id: id exceeds field cardinality");
+        }
+
+        std::uint16_t result_id = reciprocal_results[id];
+
+        // cache miss
+        if (result_id == EMPTY) {
+            const auto& element = elements_[id];
+            const auto reciprocal = element.reciprocal();
+            result_id = encode<OriginalField>(reciprocal);
+            reciprocal_results[id] = result_id;
+            ++reciprocal_misses;
+        }
+
+        return result_id;
+    };
+
+    std::size_t negation_miss_count() const {
+        return negation_misses;
+    }
+
+    std::size_t reciprocal_miss_count() const {
+        return reciprocal_misses;
     }
 };
 
