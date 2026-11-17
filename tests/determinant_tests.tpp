@@ -1,4 +1,8 @@
+#ifdef ALGEBRA_TEST_CACHED_FIELDS
+#include <algebra/finite_fields/detail/cached_finite_field.hpp>
+#else
 #include <algebra/finite_fields/finite_fields.hpp>
+#endif
 #include <exception>
 #include <iostream>
 
