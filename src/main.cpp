@@ -1,3 +1,5 @@
+#include <algebra/finite_fields/finite_fields.hpp>
+#include <algebra/matrices/matrices.hpp>
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -6,8 +8,8 @@
 #include <iostream>
 #include <random>
 #include <stdexcept>
-#include <algebra/finite_fields/finite_fields.hpp>
-#include <algebra/matrices/matrices.hpp>
+
+#include "determinant.hpp"
 
 namespace {
 
@@ -58,41 +60,6 @@ void populate(Matrix& a, Matrix& b) {
     }
 }
 
-Element determinant(Matrix matrix) {
-    Element result = Element::one();
-    for (std::size_t k = 0; k < dimension; ++k) {
-        std::size_t pivot_row = k;
-        while (pivot_row < dimension && matrix(pivot_row, k).is_zero()) {
-            ++pivot_row;
-        }
-        if (pivot_row == dimension) {
-            return Element::zero();
-        }
-        if (pivot_row != k) {
-            matrix.swap_rows(pivot_row, k);
-            result = result.negate();
-        }
-        const Element pivot = matrix(k, k);
-        result = result.multiply(pivot);
-        Element inverse = Element::one();
-        if (!pivot.is_one()) {
-            inverse = pivot.reciprocal();
-        }
-        for (std::size_t i = k + 1; i < dimension; ++i) {
-            if (matrix(i, k).is_zero()) {
-                continue;
-            }
-            const Element multiplier = matrix(i, k).multiply(inverse);
-            matrix(i, k) = Element::zero();
-            for (std::size_t j = k + 1; j < dimension; ++j) {
-                const Element correction = multiplier.multiply(matrix(k, j));
-                matrix(i, j) = matrix(i, j).add(correction.negate());
-            }
-        }
-    }
-    return result;
-}
-
 void print_determinant(const char* name, const Element& value, double elapsed) {
     std::cout << name << " = " << value << '\n';
     std::cout << "Coefficients [";
@@ -102,10 +69,11 @@ void print_determinant(const char* name, const Element& value, double elapsed) {
         }
         std::cout << value.coefficient(degree);
     }
-    std::cout << "]\nSeconds " << elapsed << '\n' << std::flush;
+    std::cout << "]\nSeconds " << elapsed << '\n'
+              << std::flush;
 }
 
-}
+}  // namespace
 
 int main() {
     try {
@@ -117,29 +85,34 @@ int main() {
                   << "Field order " << Field::cardinality() << '\n'
                   << "Modulus " << Field::modulus() << '\n';
 
-        std::cout << "Generating A and B\n" << std::flush;
+        std::cout << "Generating A and B\n"
+                  << std::flush;
         auto start = Clock::now();
         Matrix a;
         Matrix b;
         populate(a, b);
         std::cout << "Generation seconds " << seconds(start) << '\n';
 
-        std::cout << "Computing C = A * B\n" << std::flush;
+        std::cout << "Computing C = A * B\n"
+                  << std::flush;
         start = Clock::now();
         const Matrix c = a.multiply(b);
         std::cout << "Product seconds " << seconds(start) << '\n';
 
-        std::cout << "Computing det(A)\n" << std::flush;
+        std::cout << "Computing det(A)\n"
+                  << std::flush;
         start = Clock::now();
         const auto det_a = determinant(a);
         print_determinant("det(A)", det_a, seconds(start));
 
-        std::cout << "Computing det(B)\n" << std::flush;
+        std::cout << "Computing det(B)\n"
+                  << std::flush;
         start = Clock::now();
         const auto det_b = determinant(b);
         print_determinant("det(B)", det_b, seconds(start));
 
-        std::cout << "Computing det(C)\n" << std::flush;
+        std::cout << "Computing det(C)\n"
+                  << std::flush;
         start = Clock::now();
         const auto det_c = determinant(c);
         print_determinant("det(C)", det_c, seconds(start));
