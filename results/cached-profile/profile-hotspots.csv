@@ -1,0 +1,6 @@
+label,percent_self,self_seconds,calls
+Matrix multiplication,75.20,5.88,10
+Determinants (self),13.81,1.08,30
+Polynomial divmod,8.70,0.68,19085010
+Reported _init symbol,1.15,0.09,
+Element encoding,0.38,0.03,36769000

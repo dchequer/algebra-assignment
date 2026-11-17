@@ -11,9 +11,11 @@ target_compile_definitions(algebra_determinants PRIVATE
     ALGEBRA_ASSIGNMENT_SIZE=${ALGEBRA_ASSIGNMENT_SIZE}
 )
 
-# # toggle profiling flags for this target
-# target_compile_options(algebra_determinants PRIVATE -pg -g)
-# target_link_options(algebra_determinants PRIVATE -pg)
+option(ALGEBRA_ASSIGNMENT_GPROF "Instrument the executable for GNU gprof" OFF)
+if(ALGEBRA_ASSIGNMENT_GPROF)
+    target_compile_options(algebra_determinants PRIVATE -pg -g)
+    target_link_options(algebra_determinants PRIVATE -pg)
+endif()
 
 target_link_libraries(algebra_determinants PRIVATE
     algebra::finite_fields

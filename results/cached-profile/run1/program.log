@@ -1,0 +1,46 @@
+Matrix dimension 256
+Seed 123456
+Field order 1331
+Modulus 4 + 1*x^1 + 1*x^3
+Generating A and B
+Generation seconds 0.009590
+Computing C = A * B
+Product seconds 0.819076
+Computing det(A)
+det(A) = 1 + 1*x^1 + 6*x^2
+Coefficients [1, 1, 6]
+Seconds 0.039333
+Computing det(B)
+det(B) = 2 + 7*x^1 + 7*x^2
+Coefficients [2, 7, 7]
+Seconds 0.038561
+Computing det(C)
+det(C) = 4 + 1*x^1 + 6*x^2
+Coefficients [4, 1, 6]
+Seconds 0.034911
+det(A) * det(B) = 4 + 1*x^1 + 6*x^2
+Identity verified true
+Total seconds 0.941638
+	Command being timed: "../algebra_determinants"
+	User time (seconds): 0.93
+	System time (seconds): 0.00
+	Percent of CPU this job got: 100%
+	Elapsed (wall clock) time (h:mm:ss or m:ss): 0:00.94
+	Average shared text size (kbytes): 0
+	Average unshared data size (kbytes): 0
+	Average stack size (kbytes): 0
+	Average total size (kbytes): 0
+	Maximum resident set size (kbytes): 11248
+	Average resident set size (kbytes): 0
+	Major (requiring I/O) page faults: 0
+	Minor (reclaiming a frame) page faults: 1077
+	Voluntary context switches: 1
+	Involuntary context switches: 9
+	Swaps: 0
+	File system inputs: 0
+	File system outputs: 72
+	Socket messages sent: 0
+	Socket messages received: 0
+	Signals delivered: 0
+	Page size (bytes): 4096
+	Exit status: 0

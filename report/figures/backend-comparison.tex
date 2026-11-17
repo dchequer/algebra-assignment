@@ -1,0 +1,29 @@
+\documentclass[10pt,border=3pt]{standalone}
+\usepackage{mathptmx}
+\usepackage{pgfplots}
+\usepgfplotslibrary{groupplots}
+\pgfplotsset{compat=1.18,every axis/.append style={font=\small}}
+\begin{document}
+\begin{tikzpicture}
+\begin{groupplot}[
+    group style={group size=1 by 3,vertical sep=1.2cm},
+    width=8.8cm,height=4cm,
+    xmin=32,xmax=540,xtick={64,128,256,512},
+    xmajorgrids=true,ymajorgrids=true,grid style={gray!20},
+    tick align=outside,
+    xlabel={Matrix dimension $N$},
+]
+\nextgroupplot[ymode=log,ylabel={Application total (s)},
+    legend style={at={(0.02,0.98)},anchor=north west,font=\scriptsize}]
+\addplot[blue!70!black,thick,mark=*] table[x=matrix_size,y=original_median_app_seconds,col sep=comma] {../../results/backend-check/summary.csv};
+\addlegendentry{Original}
+\addplot[red!75!black,thick,mark=square*] table[x=matrix_size,y=cached_median_app_seconds,col sep=comma] {../../results/backend-check/summary.csv};
+\addlegendentry{Cached}
+\nextgroupplot[ylabel={Speedup (times)},ymin=0]
+\addplot[black,thick,mark=*] table[x=matrix_size,y=app_speedup,col sep=comma] {../../results/backend-check/summary.csv};
+\nextgroupplot[ylabel={Peak RSS (MiB)},ymin=0]
+\addplot[blue!70!black,thick,mark=*] table[x=matrix_size,y=original_max_rss_mib,col sep=comma] {../../results/backend-check/summary.csv};
+\addplot[red!75!black,thick,mark=square*] table[x=matrix_size,y=cached_max_rss_mib,col sep=comma] {../../results/backend-check/summary.csv};
+\end{groupplot}
+\end{tikzpicture}
+\end{document}

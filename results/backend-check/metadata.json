@@ -63,6 +63,18 @@
         "size": 256,
         "cxx_flags": "-O3 -DNDEBUG -std=gnu++20",
         "cached_include_selected": true
+      },
+      {
+        "backend": "original",
+        "size": 512,
+        "cxx_flags": "-O3 -DNDEBUG -std=gnu++20",
+        "cached_include_selected": false
+      },
+      {
+        "backend": "cached",
+        "size": 512,
+        "cxx_flags": "-O3 -DNDEBUG -std=gnu++20",
+        "cached_include_selected": true
       }
     ],
     "build_directory": "build",
@@ -88,10 +100,11 @@
     "matrix_sizes": [
       64,
       128,
-      256
+      256,
+      512
     ],
     "runs_per_case": 3,
-    "order": "All original sizes in ascending order, then all cached sizes in ascending order; each case has three consecutive executions.",
+    "order": "All original sizes in ascending order, then all cached sizes in ascending order; each case has three consecutive executions. After the original 18 runs, three original 512 runs were followed by three cached 512 runs.",
     "execution": "One sequential process per run, no MPI and no CPU affinity pinning.",
     "timing": "GNU Time -v surrounds each executable invocation. Application phase/total times are also retained.",
     "cache_state": "Fresh process for every repetition: arithmetic caches start empty. Catalog/table allocation and filling are included in whole-workload time; caches are shared across phases within each process.",
@@ -102,7 +115,7 @@
     "wall_time_resolution": "GNU Time wall-clock text has hundredths of a second; application output reports six decimal places."
   },
   "validation": {
-    "timed_runs": 18,
+    "timed_runs": 24,
     "all_exit_statuses_zero": true,
     "all_determinant_identities_verified": true,
     "coefficients_match_original_reference_for_every_run": true,
@@ -125,7 +138,7 @@
     "public_include_provider_checked_for_every_measured_build": true
   },
   "limitations": [
-    "Three small matrix sizes and three runs per case on one virtualized host.",
+    "Four matrix sizes and three runs per case on one virtualized host.",
     "Fixed backend order; these runs do not establish performance at assignment-scale dimensions.",
     "Later determinant phases reuse entries populated during the matrix product; these are not isolated cold determinant timings.",
     "Backend speedup includes compact element storage and cached arithmetic together.",
@@ -133,7 +146,8 @@
   ],
   "final_configuration": {
     "backend": "cached",
-    "matrix_size": 256,
-    "build_type": "Release"
+    "matrix_size": 512,
+    "build_type": "Release",
+    "note": "Configuration at the end of the additional timed runs; subsequent profiling may change the active build."
   }
 }

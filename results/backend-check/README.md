@@ -9,11 +9,12 @@ Set these CMake cache arguments, then configure and build through CMake Tools:
 ```text
 -DALGEBRA_ASSIGNMENT_BACKEND=original   # or cached
 -DCMAKE_BUILD_TYPE=Release
--DALGEBRA_ASSIGNMENT_SIZE=64           # then 128 and 256
+-DALGEBRA_ASSIGNMENT_SIZE=64           # then 128, 256, and 512
+-DALGEBRA_ASSIGNMENT_GPROF=OFF          # ordinary, uninstrumented timings
 ```
 
 The default backend is `original`. Changing backend or size requires reconfiguration
-and rebuilding. The current build is left at `cached`, Release, dimension 256.
+and rebuilding. The measured configurations use Release and have profiling off.
 
 ## Results
 
@@ -28,11 +29,14 @@ resident memory across the three runs.
 | 64 | 0.137322 | 0.124868 | 1.10x | 4.684 | 10.484 |
 | 128 | 1.079465 | 0.496593 | 2.17x | 7.121 | 10.563 |
 | 256 | 8.600025 | 0.881000 | 9.76x | 17.621 | 10.934 |
+| 512 | 70.562422 | 3.442053 | 20.50x | 59.605 | 12.473 |
 
 The cached backend helps more at larger tested dimensions. Its fixed arithmetic
 tables increase memory at dimensions 64 and 128; compact matrix elements reduce
 total memory below the original at dimension 256. The smallest timing difference
-is modest, and three sizes do not establish an exact break-even point.
+is modest, and these sizes do not establish an exact break-even point. The two
+binary cache tables alone allocate 2 * 1331 * 1331 * 2 bytes (about 6.76 MiB);
+their result slots begin empty. The smaller element IDs reduce matrix storage.
 
 ## Phase timing
 
@@ -41,6 +45,7 @@ is modest, and three sizes do not establish an exact break-even point.
 | 64 | 0.067776 | 0.067583 | 0.068851 | 0.056482 |
 | 128 | 0.543091 | 0.365153 | 0.533891 | 0.127523 |
 | 256 | 4.326935 | 0.764055 | 4.264297 | 0.107552 |
+| 512 | 36.642643 | 2.623672 | 33.812704 | 0.786267 |
 
 The cache is shared across phases. The product can populate entries that later
 determinants reuse, so these determinant times describe their position in this
@@ -57,7 +62,7 @@ and reported to hundredths of a second.
 
 - [summary.csv](./summary.csv): direct backend comparisons.
 - [backend-summary.csv](./backend-summary.csv): medians, ranges, phase times, and memory per case.
-- [runs.csv](./runs.csv): all 18 individual measurements and log filenames.
+- [runs.csv](./runs.csv): all 24 individual measurements and log filenames.
 - [metadata.json](./metadata.json): build settings, source hashes, host, and validation.
 - The `original-8-reference.log` and `cached-8-reference.log` files retain the smoke checks.
 
@@ -73,6 +78,10 @@ zero and matched the three known determinant coefficient arrays for their dimens
 Both backends were measured again here; comparisons do not mix these cached runs
 with the earlier baseline collection.
 
-These are initial measurements on `louie`, not assignment-scale extrapolations.
-Comparison figures and profiling of the cached implementation remain for the
-measurement/report stage.
+The 512 measurements were collected afterward, three original runs followed by
+three cached runs, with a 120-second timeout per run. Each original run took
+approximately 70 seconds and peaked below 60 MiB; the cached runs took roughly
+3.4 seconds and peaked below 13 MiB. The source hashes and Release flags matched
+the earlier measurements. These are measurements on `louie`, not assignment-scale
+extrapolations. See the [comparison figure](../../report/figures/backend-comparison.pdf)
+and the separately instrumented [cached profile](../cached-profile/README.md).

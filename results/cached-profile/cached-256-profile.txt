@@ -1,0 +1,148 @@
+Flat profile:
+
+Each sample counts as 0.01 seconds.
+  %   cumulative   self              self     total           
+ time   seconds   seconds    calls  ms/call  ms/call  name    
+ 75.20      5.88     5.88       10   588.08   659.13  algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::multiply<256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> const&) const
+ 13.81      6.96     1.08       30    36.00    36.07  algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> algebra::determinant<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>)
+  8.70      7.64     0.68 19085010     0.00     0.00  algebra::Polynomial<algebra::PrimeFieldElement<11u> >::divmod(algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) const
+  1.15      7.73     0.09                             _init
+  0.38      7.76     0.03 36769000     0.00     0.00  unsigned int algebra::detail::cached_fields::encode<algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible> >(algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible>::Element const&)
+  0.26      7.78     0.02 18364760     0.00     0.00  algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible>::modulus()
+  0.26      7.80     0.02       10     2.00     2.00  algebra::Polynomial<algebra::PrimeFieldElement<11u> > algebra::FirstEnumeratedIrreducible::polynomial<11u, 3ul>()
+  0.13      7.81     0.01       10     1.00     1.05  algebra::detail::cached_fields::CacheState<algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible> >::CacheState()
+  0.13      7.82     0.01                             std::vector<algebra::detail::original_fields::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, std::allocator<algebra::detail::original_fields::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> > >::~vector()
+  0.00      7.82     0.00  1310720     0.00     0.00  (anonymous namespace)::next_element(std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>&)
+  0.00      7.82     0.00   655360     0.00     0.00  algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::check_index(unsigned long, unsigned long)
+  0.00      7.82     0.00     6310     0.00     0.00  std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>::_M_gen_rand()
+  0.00      7.82     0.00     6040     0.00     0.00  algebra::detail::original_fields::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>::reciprocal() const
+  0.00      7.82     0.00      170     0.00     0.00  bool algebra::is_irreducible<11u>(algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&)
+  0.00      7.82     0.00       40     0.00     0.00  algebra::operator<<(std::ostream&, algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> const&)
+  0.00      7.82     0.00       30     0.00     0.00  (anonymous namespace)::print_determinant(char const*, algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> const&, double)
+  0.00      7.82     0.00       30     0.00     0.00  std::vector<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, std::allocator<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> > >::vector(std::vector<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, std::allocator<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> > > const&)
+  0.00      7.82     0.00       20     0.00     0.00  algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::Matrix()
+  0.00      7.82     0.00       10     0.00     4.78  (anonymous namespace)::populate(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>&, algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>&)
+  0.00      7.82     0.00       10     0.00     0.00  algebra::Polynomial<algebra::PrimeFieldElement<11u> >::operator<<[friend](std::ostream&, algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&)
+  0.00      7.82     0.00       10     0.00     0.00  algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>::multiply(algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> const&) const
+
+			Call graph
+
+
+granularity: each sample hit covers 2 byte(s) for 0.13% of 7.82 seconds
+
+index % time    self  children    called     name
+                                                 <spontaneous>
+[1]     98.7    0.00    7.72                 main [1]
+                5.88    0.71      10/10          algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::multiply<256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> const&) const [2]
+                1.08    0.00      30/30          algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> algebra::determinant<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>) [3]
+                0.00    0.05      10/10          (anonymous namespace)::populate(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>&, algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>&) [7]
+                0.00    0.00      20/18364760     algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible>::modulus() [8]
+                0.00    0.00      30/30          std::vector<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, std::allocator<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> > >::vector(std::vector<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, std::allocator<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> > > const&) [25]
+                0.00    0.00      30/30          (anonymous namespace)::print_determinant(char const*, algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> const&, double) [24]
+                0.00    0.00      20/20          algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::Matrix() [26]
+                0.00    0.00      10/10          algebra::Polynomial<algebra::PrimeFieldElement<11u> >::operator<<[friend](std::ostream&, algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) [27]
+                0.00    0.00      10/10          algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>::multiply(algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> const&) const [28]
+                0.00    0.00      10/40          algebra::operator<<(std::ostream&, algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> const&) [23]
+-----------------------------------------------
+                5.88    0.71      10/10          main [1]
+[2]     84.3    5.88    0.71      10         algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::multiply<256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> const&) const [2]
+                0.63    0.00 17709340/19085010     algebra::Polynomial<algebra::PrimeFieldElement<11u> >::divmod(algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) const [4]
+                0.02    0.02 18364710/18364760     algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible>::modulus() [8]
+                0.03    0.00 35423600/36769000     unsigned int algebra::detail::cached_fields::encode<algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible> >(algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible>::Element const&) [9]
+                0.01    0.00      10/10          algebra::detail::cached_fields::CacheState<algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible> >::CacheState() [11]
+                0.00    0.00  655360/655360      algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::check_index(unsigned long, unsigned long) [20]
+-----------------------------------------------
+                1.08    0.00      30/30          main [1]
+[3]     13.8    1.08    0.00      30         algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> algebra::determinant<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>) [3]
+                0.00    0.00   28640/19085010     algebra::Polynomial<algebra::PrimeFieldElement<11u> >::divmod(algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) const [4]
+                0.00    0.00    6040/6040        algebra::detail::original_fields::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>::reciprocal() const [13]
+                0.00    0.00   34680/36769000     unsigned int algebra::detail::cached_fields::encode<algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible> >(algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible>::Element const&) [9]
+                0.00    0.00      30/18364760     algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible>::modulus() [8]
+-----------------------------------------------
+                0.00    0.00   13310/19085010     algebra::detail::cached_fields::CacheState<algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible> >::CacheState() [11]
+                0.00    0.00   23000/19085010     algebra::detail::original_fields::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>::reciprocal() const [13]
+                0.00    0.00   28640/19085010     algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> algebra::determinant<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>) [3]
+                0.05    0.00 1310720/19085010     (anonymous namespace)::next_element(std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>&) [6]
+                0.63    0.00 17709340/19085010     algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::multiply<256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> const&) const [2]
+[4]      8.7    0.68    0.00 19085010         algebra::Polynomial<algebra::PrimeFieldElement<11u> >::divmod(algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) const [4]
+-----------------------------------------------
+                                                 <spontaneous>
+[5]      1.2    0.09    0.00                 _init [5]
+-----------------------------------------------
+                0.00    0.05 1310720/1310720     (anonymous namespace)::populate(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>&, algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>&) [7]
+[6]      0.6    0.00    0.05 1310720         (anonymous namespace)::next_element(std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>&) [6]
+                0.05    0.00 1310720/19085010     algebra::Polynomial<algebra::PrimeFieldElement<11u> >::divmod(algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) const [4]
+                0.00    0.00 1310720/36769000     unsigned int algebra::detail::cached_fields::encode<algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible> >(algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible>::Element const&) [9]
+                0.00    0.00    6310/6310        std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>::_M_gen_rand() [21]
+-----------------------------------------------
+                0.00    0.05      10/10          main [1]
+[7]      0.6    0.00    0.05      10         (anonymous namespace)::populate(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>&, algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>&) [7]
+                0.00    0.05 1310720/1310720     (anonymous namespace)::next_element(std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>&) [6]
+-----------------------------------------------
+                0.00    0.00      20/18364760     main [1]
+                0.00    0.00      30/18364760     algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> algebra::determinant<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>) [3]
+                0.02    0.02 18364710/18364760     algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::multiply<256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> const&) const [2]
+[8]      0.5    0.02    0.02 18364760         algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible>::modulus() [8]
+                0.02    0.00      10/10          algebra::Polynomial<algebra::PrimeFieldElement<11u> > algebra::FirstEnumeratedIrreducible::polynomial<11u, 3ul>() [10]
+                0.00    0.00      10/170         bool algebra::is_irreducible<11u>(algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) [22]
+-----------------------------------------------
+                0.00    0.00   34680/36769000     algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> algebra::determinant<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>) [3]
+                0.00    0.00 1310720/36769000     (anonymous namespace)::next_element(std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>&) [6]
+                0.03    0.00 35423600/36769000     algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::multiply<256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> const&) const [2]
+[9]      0.4    0.03    0.00 36769000         unsigned int algebra::detail::cached_fields::encode<algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible> >(algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible>::Element const&) [9]
+-----------------------------------------------
+                0.02    0.00      10/10          algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible>::modulus() [8]
+[10]     0.3    0.02    0.00      10         algebra::Polynomial<algebra::PrimeFieldElement<11u> > algebra::FirstEnumeratedIrreducible::polynomial<11u, 3ul>() [10]
+                0.00    0.00     160/170         bool algebra::is_irreducible<11u>(algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) [22]
+-----------------------------------------------
+                0.01    0.00      10/10          algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::multiply<256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> const&) const [2]
+[11]     0.1    0.01    0.00      10         algebra::detail::cached_fields::CacheState<algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible> >::CacheState() [11]
+                0.00    0.00   13310/19085010     algebra::Polynomial<algebra::PrimeFieldElement<11u> >::divmod(algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) const [4]
+-----------------------------------------------
+                                                 <spontaneous>
+[12]     0.1    0.01    0.00                 std::vector<algebra::detail::original_fields::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, std::allocator<algebra::detail::original_fields::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> > >::~vector() [12]
+-----------------------------------------------
+                0.00    0.00    6040/6040        algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> algebra::determinant<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>) [3]
+[13]     0.0    0.00    0.00    6040         algebra::detail::original_fields::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>::reciprocal() const [13]
+                0.00    0.00   23000/19085010     algebra::Polynomial<algebra::PrimeFieldElement<11u> >::divmod(algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) const [4]
+-----------------------------------------------
+                0.00    0.00  655360/655360      algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::multiply<256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> const&) const [2]
+[20]     0.0    0.00    0.00  655360         algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::check_index(unsigned long, unsigned long) [20]
+-----------------------------------------------
+                0.00    0.00    6310/6310        (anonymous namespace)::next_element(std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>&) [6]
+[21]     0.0    0.00    0.00    6310         std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>::_M_gen_rand() [21]
+-----------------------------------------------
+                0.00    0.00      10/170         algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible>::modulus() [8]
+                0.00    0.00     160/170         algebra::Polynomial<algebra::PrimeFieldElement<11u> > algebra::FirstEnumeratedIrreducible::polynomial<11u, 3ul>() [10]
+[22]     0.0    0.00    0.00     170         bool algebra::is_irreducible<11u>(algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) [22]
+-----------------------------------------------
+                0.00    0.00      10/40          main [1]
+                0.00    0.00      30/40          (anonymous namespace)::print_determinant(char const*, algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> const&, double) [24]
+[23]     0.0    0.00    0.00      40         algebra::operator<<(std::ostream&, algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> const&) [23]
+-----------------------------------------------
+                0.00    0.00      30/30          main [1]
+[24]     0.0    0.00    0.00      30         (anonymous namespace)::print_determinant(char const*, algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> const&, double) [24]
+                0.00    0.00      30/40          algebra::operator<<(std::ostream&, algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> const&) [23]
+-----------------------------------------------
+                0.00    0.00      30/30          main [1]
+[25]     0.0    0.00    0.00      30         std::vector<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, std::allocator<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> > >::vector(std::vector<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, std::allocator<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> > > const&) [25]
+-----------------------------------------------
+                0.00    0.00      20/20          main [1]
+[26]     0.0    0.00    0.00      20         algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::Matrix() [26]
+-----------------------------------------------
+                0.00    0.00      10/10          main [1]
+[27]     0.0    0.00    0.00      10         algebra::Polynomial<algebra::PrimeFieldElement<11u> >::operator<<[friend](std::ostream&, algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) [27]
+-----------------------------------------------
+                0.00    0.00      10/10          main [1]
+[28]     0.0    0.00    0.00      10         algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>::multiply(algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> const&) const [28]
+-----------------------------------------------
+
+Index by function name
+
+   [6] (anonymous namespace)::next_element(std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>&) (main.cpp) [20] algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::check_index(unsigned long, unsigned long) [28] algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>::multiply(algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> const&) const
+  [24] (anonymous namespace)::print_determinant(char const*, algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> const&, double) (main.cpp) [26] algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::Matrix() [2] algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>::multiply<256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul> const&) const
+   [7] (anonymous namespace)::populate(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>&, algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>&) (main.cpp) [11] algebra::detail::cached_fields::CacheState<algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible> >::CacheState() [13] algebra::detail::original_fields::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>::reciprocal() const
+  [27] algebra::Polynomial<algebra::PrimeFieldElement<11u> >::operator<<[friend](std::ostream&, algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) [9] unsigned int algebra::detail::cached_fields::encode<algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible> >(algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible>::Element const&) [21] std::mersenne_twister_engine<unsigned long, 32ul, 624ul, 397ul, 31ul, 2567483615ul, 11ul, 4294967295ul, 7ul, 2636928640ul, 15ul, 4022730752ul, 18ul, 1812433253ul>::_M_gen_rand()
+   [3] algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> algebra::determinant<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul>(algebra::Matrix<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, 256ul, 256ul>) [8] algebra::detail::original_fields::FiniteField<11u, 3ul, algebra::FirstEnumeratedIrreducible>::modulus() [25] std::vector<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, std::allocator<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> > >::vector(std::vector<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, std::allocator<algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> > > const&)
+  [22] bool algebra::is_irreducible<11u>(algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) [23] algebra::operator<<(std::ostream&, algebra::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> const&) [12] std::vector<algebra::detail::original_fields::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible>, std::allocator<algebra::detail::original_fields::FiniteFieldElement<11u, 3ul, algebra::FirstEnumeratedIrreducible> > >::~vector()
+  [10] algebra::Polynomial<algebra::PrimeFieldElement<11u> > algebra::FirstEnumeratedIrreducible::polynomial<11u, 3ul>() [4] algebra::Polynomial<algebra::PrimeFieldElement<11u> >::divmod(algebra::Polynomial<algebra::PrimeFieldElement<11u> > const&) const [5] _init
