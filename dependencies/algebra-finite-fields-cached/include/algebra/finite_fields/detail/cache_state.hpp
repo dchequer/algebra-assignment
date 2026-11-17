@@ -16,6 +16,15 @@ class CacheState {
     // private sequence of OriginalField.Element values
     std::vector<typename OriginalField::Element> elements_;
 
+    std::uint16_t result_id_;
+    std::uint16_t EMPTY = 0xFFFF;  // 65535 - max value for uint16_t
+
+    std::vector<std::uint16_t> multiplication_results;
+    std::size_t multiplication_misses = 0;
+
+    std::vector<std::uint16_t> addition_results;
+    std::size_t addition_misses = 0;
+
    public:
     using OriginalFieldType = OriginalField;
 
@@ -26,6 +35,11 @@ class CacheState {
         for (std::uint32_t id = 0; id < OriginalField::cardinality(); ++id) {
             elements_.push_back(decode<OriginalField>(id));
         }
+
+        const std::size_t Q = static_cast<std::size_t>(OriginalField::cardinality());
+        multiplication_results.assign(Q * Q, EMPTY);
+
+        addition_results.assign(Q * Q, EMPTY);
     }
 
     std::size_t size() const {
@@ -38,11 +52,65 @@ class CacheState {
         }
         return elements_[id];
     }
+
+    std::uint16_t multiply_ids(std::uint16_t id1, std::uint16_t id2) {
+        const std::size_t Q = elements_.size();
+
+        if (id1 >= Q || id2 >= Q) {
+            throw std::out_of_range("CacheState: multiply_ids: id exceeds field cardinality");
+        }
+
+        std::size_t index = static_cast<std::size_t>(id1) * Q + id2;
+        result_id_ = multiplication_results[index];
+
+        // cache miss
+        if (result_id_ == EMPTY) {
+            const auto& element1 = elements_[id1];
+            const auto& element2 = elements_[id2];
+            const auto product = element1.multiply(element2);
+            result_id_ = encode<OriginalField>(product);
+            multiplication_results[index] = result_id_;
+            ++multiplication_misses;
+        }
+
+        return result_id_;
+    }
+
+    std::size_t multiplication_miss_count() const {
+        return multiplication_misses;
+    }
+
+    std::uint16_t add_ids(std::uint16_t id1, std::uint16_t id2) {
+        const std::size_t Q = elements_.size();
+
+        if (id1 >= Q || id2 >= Q) {
+            throw std::out_of_range("CacheState: add_ids: id exceeds field cardinality");
+        }
+
+        std::size_t index = static_cast<std::size_t>(id1) * Q + id2;
+        result_id_ = addition_results[index];
+
+        // cache miss
+        if (result_id_ == EMPTY) {
+            const auto& element1 = elements_[id1];
+            const auto& element2 = elements_[id2];
+            const auto sum = element1.add(element2);
+            result_id_ = encode<OriginalField>(sum);
+            addition_results[index] = result_id_;
+            ++addition_misses;
+        }
+
+        return result_id_;
+    };
+
+    std::size_t addition_miss_count() const {
+        return addition_misses;
+    }
 };
 
 template <typename OriginalField>
-const CacheState<OriginalField>& state_for() {
-    static const CacheState<OriginalField> instance;
+CacheState<OriginalField>& state_for() {
+    static CacheState<OriginalField> instance;
     return instance;
 }
 
