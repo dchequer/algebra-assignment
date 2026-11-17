@@ -1,0 +1,23 @@
+Matrix dimension 8
+Seed 123456
+Field order 1331
+Modulus 4 + 1*x^1 + 1*x^3
+Generating A and B
+Generation seconds 0.000012
+Computing C = A * B
+Product seconds 0.002432
+Computing det(A)
+det(A) = 6 + 2*x^1
+Coefficients [6, 2, 0]
+Seconds 0.000075
+Computing det(B)
+det(B) = 4 + 3*x^1 + 2*x^2
+Coefficients [4, 3, 2]
+Seconds 0.000063
+Computing det(C)
+det(C) = 8 + 7*x^2
+Coefficients [8, 0, 7]
+Seconds 0.000069
+det(A) * det(B) = 8 + 7*x^2
+Identity verified true
+Total seconds 0.002749

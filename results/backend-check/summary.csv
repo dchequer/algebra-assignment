@@ -1,0 +1,4 @@
+matrix_size,original_median_app_seconds,cached_median_app_seconds,app_speedup,original_max_rss_mib,cached_max_rss_mib,original_median_det_sum_seconds,cached_median_det_sum_seconds,determinant_phase_speedup,original_median_product_seconds,cached_median_product_seconds
+64,0.137322,0.124868,1.099737,4.683594,10.484375,0.068851,0.056482,1.218990,0.067776,0.067583
+128,1.079465,0.496593,2.173742,7.121094,10.562500,0.533891,0.127523,4.186625,0.543091,0.365153
+256,8.600025,0.881000,9.761663,17.621094,10.933594,4.264297,0.107552,39.648700,4.326935,0.764055

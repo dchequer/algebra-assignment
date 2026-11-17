@@ -1,0 +1,139 @@
+{
+  "collected_at_utc": "2026-11-17T09:36:00Z",
+  "purpose": "Quick sequential backend comparison, not a complete scaling or MPI study",
+  "host": {
+    "hostname": "louie",
+    "logical_cpus": 4,
+    "cpu_model": "12th Gen Intel(R) Core(TM) i3-12100F",
+    "total_memory_kib": 16377064
+  },
+  "source": {
+    "base_commit": "a0de27529f4c7069576ccec08d79088a1660632d",
+    "working_tree_has_local_changes": true,
+    "measured_program_sha256": {
+      "src/main.cpp": "b2585af42599011128680671fd42665cbeb45a310236407ad1a58df93be4873a",
+      "include/determinant.hpp": "ea9422cea98160244248a63cf981f78cbd79258fff9f2e412cf16464fc9220e8",
+      "dependencies/algebra-finite-fields-cached/include/algebra/finite_fields/detail/cached_finite_field.hpp": "43529b657e24b2949f12d1d2f1122fc47a769ab2a40a2bc9bd3252125d3d8115",
+      "dependencies/algebra-finite-fields-cached/include/algebra/finite_fields/detail/cache_state.hpp": "f1700cd931d7c482aa362f3262d24e66d1bad54808456cdbd797df2d736a59ae",
+      "dependencies/algebra-finite-fields-cached/include/algebra/finite_fields/detail/element_id.hpp": "08bd9d3661c40e079983363459af9eed1bb0f87dd8171fe4c2bef3e3d8d4d2cd",
+      "dependencies/algebra-finite-fields-cached/include/algebra/finite_fields/detail/original_finite_field.hpp": "7d18a6ec23dd7c0c896bb4c88c99979029e45b94fa8ea04a6497b87aea139f3c"
+    },
+    "finite_fields_upstream_commit": "74b3d569fb48818f4c10f3c32889f2128485f1a7",
+    "matrices_upstream_commit": "84abddac26d2805072efcb1c44bbe7faac45fa6b"
+  },
+  "build": {
+    "compiler": "GNU g++ 14.2.0",
+    "cmake": "cmake version 3.31.6",
+    "type": "Release",
+    "flags": "-O3 -DNDEBUG -std=gnu++20",
+    "profiling_enabled": false,
+    "builds": [
+      {
+        "backend": "original",
+        "size": 64,
+        "cxx_flags": "-O3 -DNDEBUG -std=gnu++20",
+        "cached_include_selected": false
+      },
+      {
+        "backend": "original",
+        "size": 128,
+        "cxx_flags": "-O3 -DNDEBUG -std=gnu++20",
+        "cached_include_selected": false
+      },
+      {
+        "backend": "original",
+        "size": 256,
+        "cxx_flags": "-O3 -DNDEBUG -std=gnu++20",
+        "cached_include_selected": false
+      },
+      {
+        "backend": "cached",
+        "size": 64,
+        "cxx_flags": "-O3 -DNDEBUG -std=gnu++20",
+        "cached_include_selected": true
+      },
+      {
+        "backend": "cached",
+        "size": 128,
+        "cxx_flags": "-O3 -DNDEBUG -std=gnu++20",
+        "cached_include_selected": true
+      },
+      {
+        "backend": "cached",
+        "size": 256,
+        "cxx_flags": "-O3 -DNDEBUG -std=gnu++20",
+        "cached_include_selected": true
+      }
+    ],
+    "build_directory": "build",
+    "builds_outside_measurement": true
+  },
+  "field": {
+    "characteristic": 11,
+    "extension_degree": 3,
+    "cardinality": 1331,
+    "modulus_coefficients": [
+      4,
+      1,
+      0,
+      1
+    ],
+    "seed": 123456
+  },
+  "measurement": {
+    "backends": [
+      "original",
+      "cached"
+    ],
+    "matrix_sizes": [
+      64,
+      128,
+      256
+    ],
+    "runs_per_case": 3,
+    "order": "All original sizes in ascending order, then all cached sizes in ascending order; each case has three consecutive executions.",
+    "execution": "One sequential process per run, no MPI and no CPU affinity pinning.",
+    "timing": "GNU Time -v surrounds each executable invocation. Application phase/total times are also retained.",
+    "cache_state": "Fresh process for every repetition: arithmetic caches start empty. Catalog/table allocation and filling are included in whole-workload time; caches are shared across phases within each process.",
+    "app_timer_boundary": "Starts before field initialization; stops before static cache destruction. GNU Time encloses process lifetime.",
+    "summary": "Timing medians are computed independently. Determinant sum is calculated per run before its median. Peak RSS is the maximum over three runs.",
+    "speedup": "Ratio of original median application total to cached median application total.",
+    "rss_units": "KiB in logs and CSV; MiB = KiB / 1024.",
+    "wall_time_resolution": "GNU Time wall-clock text has hundredths of a second; application output reports six decimal places."
+  },
+  "validation": {
+    "timed_runs": 18,
+    "all_exit_statuses_zero": true,
+    "all_determinant_identities_verified": true,
+    "coefficients_match_original_reference_for_every_run": true,
+    "dimension_8_smoke": {
+      "dimension": 8,
+      "coefficients": [
+        "6, 2, 0",
+        "4, 3, 2",
+        "8, 0, 7"
+      ],
+      "both_identity_checks_passed": true
+    },
+    "tests": {
+      "original": 5,
+      "cached": 5,
+      "final_backend": "cached",
+      "final_matrix_size": 256,
+      "build_type": "Release"
+    },
+    "public_include_provider_checked_for_every_measured_build": true
+  },
+  "limitations": [
+    "Three small matrix sizes and three runs per case on one virtualized host.",
+    "Fixed backend order; these runs do not establish performance at assignment-scale dimensions.",
+    "Later determinant phases reuse entries populated during the matrix product; these are not isolated cold determinant timings.",
+    "Backend speedup includes compact element storage and cached arithmetic together.",
+    "Compilation and full test suites were excluded from timed execution."
+  ],
+  "final_configuration": {
+    "backend": "cached",
+    "matrix_size": 256,
+    "build_type": "Release"
+  }
+}
