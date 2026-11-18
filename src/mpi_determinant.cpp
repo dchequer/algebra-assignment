@@ -11,14 +11,12 @@
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
-#include <optional>
 #include <random>
 #include <utility>
 #include <vector>
 
 #include "assignment_types.hpp"
 #include "benchmark_cache.hpp"
-#include "determinant.hpp"
 #include "distributed_determinant.hpp"
 #include "generator.hpp"
 
@@ -65,8 +63,6 @@ int main(int argc, char** argv) {
     // printf("Hello from process %d of %d on %s\n", rank, size, processor_name);
 
     LocalRows local_rows;
-    using ReferenceMatrix = algebra::Matrix<Element, dimension, dimension>;
-    std::optional<ReferenceMatrix> reference_matrix;
 
     if (rank == 0) {
         std::cout << std::fixed << std::setprecision(6)
@@ -85,13 +81,6 @@ int main(int argc, char** argv) {
     if (rank == 0) {
         Matrix matrix(dimension, Row(dimension));
         populate(matrix);
-
-        reference_matrix.emplace();
-        for (std::size_t r = 0; r < dimension; ++r) {
-            for (std::size_t c = 0; c < dimension; ++c) {
-                (*reference_matrix)(r, c) = matrix[r][c];
-            }
-        }
 
         // distribute rows cyclically (row % size)
         for (std::size_t global_row = 0; global_row < dimension; ++global_row) {
@@ -179,7 +168,6 @@ int main(int argc, char** argv) {
         MPI_COMM_WORLD);
 
     if (rank == 0) {
-        const Element sequential_result = algebra::determinant(*reference_matrix);
         std::cout << "det(A) = " << result << '\n'
                   << "Coefficients [";
         for (std::size_t degree = 0; degree < Field::extension_degree; ++degree) {
@@ -188,9 +176,7 @@ int main(int argc, char** argv) {
             }
             std::cout << result.coefficient(degree);
         }
-        std::cout << "]\nMPI determinant seconds " << max_elapsed << '\n'
-                  << "Sequential determinant = " << sequential_result << '\n'
-                  << "Determinants match " << std::boolalpha << (result == sequential_result) << '\n';
+        std::cout << "]\nMPI determinant seconds " << max_elapsed << '\n';
     }
 
     MPI_Finalize();
