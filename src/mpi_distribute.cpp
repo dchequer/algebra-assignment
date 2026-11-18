@@ -40,8 +40,8 @@ int main(int argc, char** argv) {
     if (rank == 0) {
         // init matrix on rank 0
         Matrix matrix(dimension, Row(dimension));
-        for (std::size_t r = 0; r < dimension; ++r) {
-            for (std::size_t c = 0; c < dimension; ++c) {
+        for (std::uint16_t r = 0; r < dimension; ++r) {
+            for (std::uint16_t c = 0; c < dimension; ++c) {
                 matrix[r][c] = Element::from_coefficients({r, c, 1});
             }
         }
