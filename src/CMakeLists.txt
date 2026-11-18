@@ -22,6 +22,22 @@ target_link_libraries(algebra_determinants PRIVATE
     algebra::matrices
 )
 
+add_executable(sequential_determinant sequential_determinant.cpp)
+target_compile_features(sequential_determinant PRIVATE cxx_std_20)
+target_compile_definitions(sequential_determinant PRIVATE
+    ALGEBRA_ASSIGNMENT_SIZE=${ALGEBRA_ASSIGNMENT_SIZE}
+)
+if(ALGEBRA_ASSIGNMENT_BACKEND STREQUAL "cached")
+    target_compile_definitions(sequential_determinant PRIVATE ALGEBRA_ASSIGNMENT_BENCHMARK_CACHED)
+endif()
+target_include_directories(sequential_determinant PRIVATE
+    ${CMAKE_CURRENT_SOURCE_DIR}/../include
+)
+target_link_libraries(sequential_determinant PRIVATE
+    algebra::finite_fields
+    algebra::matrices
+)
+
 option(ALGEBRA_ASSIGNMENT_BUILD_MPI "Build MPI programs" OFF)
 
 if(ALGEBRA_ASSIGNMENT_BUILD_MPI)
@@ -50,6 +66,9 @@ if(ALGEBRA_ASSIGNMENT_BUILD_MPI)
     target_compile_definitions(mpi_determinant PRIVATE
         ALGEBRA_ASSIGNMENT_SIZE=${ALGEBRA_ASSIGNMENT_SIZE}
     )
+    if(ALGEBRA_ASSIGNMENT_BACKEND STREQUAL "cached")
+        target_compile_definitions(mpi_determinant PRIVATE ALGEBRA_ASSIGNMENT_BENCHMARK_CACHED)
+    endif()
     target_link_libraries(mpi_determinant PRIVATE
         MPI::MPI_CXX
         algebra::finite_fields

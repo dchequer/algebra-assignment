@@ -11,11 +11,13 @@
 #include <cstdlib>
 #include <iomanip>
 #include <iostream>
+#include <optional>
 #include <random>
 #include <utility>
 #include <vector>
 
 #include "assignment_types.hpp"
+#include "benchmark_cache.hpp"
 #include "determinant.hpp"
 #include "distributed_determinant.hpp"
 #include "generator.hpp"
@@ -49,13 +51,22 @@ int main(int argc, char** argv) {
     MPI_Comm_rank(MPI_COMM_WORLD, &rank);
     MPI_Comm_size(MPI_COMM_WORLD, &size);
 
+    Field::initialize();
+    MPI_Barrier(MPI_COMM_WORLD);
+    const double cache_start = MPI_Wtime();
+    benchmark_cache::initialize();
+    const double local_cache_seconds = MPI_Wtime() - cache_start;
+    double max_cache_seconds = 0.0;
+    MPI_Reduce(&local_cache_seconds, &max_cache_seconds, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
     char processor_name[MPI_MAX_PROCESSOR_NAME];
     int name_len;
     MPI_Get_processor_name(processor_name, &name_len);
     // printf("Hello from process %d of %d on %s\n", rank, size, processor_name);
 
     LocalRows local_rows;
-    Element sequential_result = Element::zero();
+    using ReferenceMatrix = algebra::Matrix<Element, dimension, dimension>;
+    std::optional<ReferenceMatrix> reference_matrix;
 
     if (rank == 0) {
         std::cout << std::fixed << std::setprecision(6)
@@ -64,20 +75,23 @@ int main(int argc, char** argv) {
                   << "Field order " << Field::cardinality() << '\n'
                   << "Modulus " << Field::modulus() << '\n'
                   << "MPI ranks " << size << '\n'
-                  << "Generating A and checking sequential determinant\n"
+                  << "Cache initialization max seconds " << max_cache_seconds << '\n'
+                  << "Generating A\n"
                   << std::flush;
+    }
 
+    MPI_Barrier(MPI_COMM_WORLD);
+    const double setup_start = MPI_Wtime();
+    if (rank == 0) {
         Matrix matrix(dimension, Row(dimension));
         populate(matrix);
 
-        algebra::Matrix<Element, dimension, dimension> reference_matrix;
+        reference_matrix.emplace();
         for (std::size_t r = 0; r < dimension; ++r) {
             for (std::size_t c = 0; c < dimension; ++c) {
-                reference_matrix(r, c) = matrix[r][c];
+                (*reference_matrix)(r, c) = matrix[r][c];
             }
         }
-
-        sequential_result = algebra::determinant(reference_matrix);
 
         // distribute rows cyclically (row % size)
         for (std::size_t global_row = 0; global_row < dimension; ++global_row) {
@@ -122,8 +136,31 @@ int main(int argc, char** argv) {
             local_rows.emplace_back(global_row, std::move(decoded_row));
         }
     }
+    MPI_Barrier(MPI_COMM_WORLD);
+    const double local_setup_seconds = MPI_Wtime() - setup_start;
+    double max_setup_seconds = 0.0;
+    MPI_Reduce(&local_setup_seconds, &max_setup_seconds, 1, MPI_DOUBLE, MPI_MAX, 0, MPI_COMM_WORLD);
+
+#ifdef ALGEBRA_ASSIGNMENT_BENCHMARK_CACHED
+    const int local_cache_empty = benchmark_cache::arithmetic_entries_empty() ? 1 : 0;
+    int all_caches_empty = 0;
+    MPI_Allreduce(&local_cache_empty, &all_caches_empty, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
     if (rank == 0) {
-        std::cout << "Computing det(A) with MPI\n" << std::flush;
+        std::cout << "Arithmetic cache entries empty on all ranks before determinant "
+                  << std::boolalpha << (all_caches_empty != 0) << '\n';
+    }
+    if (!all_caches_empty) {
+        if (rank == 0) {
+            std::cerr << "Matrix setup filled arithmetic cache entries; benchmark policy not met\n";
+        }
+        MPI_Finalize();
+        return EXIT_FAILURE;
+    }
+#endif
+    if (rank == 0) {
+        std::cout << "Matrix preparation and distribution max seconds " << max_setup_seconds << '\n'
+                  << "Computing det(A) with MPI\n"
+                  << std::flush;
     }
     MPI_Barrier(MPI_COMM_WORLD);
     const double start = MPI_Wtime();
@@ -142,6 +179,7 @@ int main(int argc, char** argv) {
         MPI_COMM_WORLD);
 
     if (rank == 0) {
+        const Element sequential_result = algebra::determinant(*reference_matrix);
         std::cout << "det(A) = " << result << '\n'
                   << "Coefficients [";
         for (std::size_t degree = 0; degree < Field::extension_degree; ++degree) {
@@ -154,14 +192,6 @@ int main(int argc, char** argv) {
                   << "Sequential determinant = " << sequential_result << '\n'
                   << "Determinants match " << std::boolalpha << (result == sequential_result) << '\n';
     }
-
-    // for (const auto& [global_row, row] : local_rows) {
-    //     std::printf("Rank %d | Global Row %zu:", rank, global_row);
-    //     for (const auto& element : row) {
-    //         std::printf(" %u", static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(element)));
-    //     }
-    //     std::printf("\n");
-    // }
 
     MPI_Finalize();
     return EXIT_SUCCESS;
