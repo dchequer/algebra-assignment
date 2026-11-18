@@ -30,4 +30,15 @@ if(ALGEBRA_ASSIGNMENT_BUILD_MPI)
     add_executable(mpi_hello mpi_hello.cpp)
     target_compile_features(mpi_hello PRIVATE cxx_std_20)
     target_link_libraries(mpi_hello PRIVATE MPI::MPI_CXX)
+
+    add_executable(mpi_distribute mpi_distribute.cpp)
+    target_compile_features(mpi_distribute PRIVATE cxx_std_20)
+    target_compile_definitions(mpi_distribute PRIVATE
+        ALGEBRA_ASSIGNMENT_SIZE=${ALGEBRA_ASSIGNMENT_SIZE}
+    )
+    target_link_libraries(mpi_distribute PRIVATE
+        MPI::MPI_CXX
+        algebra::finite_fields
+        algebra::matrices
+    )
 endif()
