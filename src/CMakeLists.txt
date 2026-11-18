@@ -21,3 +21,13 @@ target_link_libraries(algebra_determinants PRIVATE
     algebra::finite_fields
     algebra::matrices
 )
+
+option(ALGEBRA_ASSIGNMENT_BUILD_MPI "Build MPI programs" OFF)
+
+if(ALGEBRA_ASSIGNMENT_BUILD_MPI)
+    find_package(MPI REQUIRED COMPONENTS CXX)
+
+    add_executable(mpi_hello mpi_hello.cpp)
+    target_compile_features(mpi_hello PRIVATE cxx_std_20)
+    target_link_libraries(mpi_hello PRIVATE MPI::MPI_CXX)
+endif()
