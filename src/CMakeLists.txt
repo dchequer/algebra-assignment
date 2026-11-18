@@ -33,6 +33,9 @@ if(ALGEBRA_ASSIGNMENT_BUILD_MPI)
 
     add_executable(mpi_distribute mpi_distribute.cpp)
     target_compile_features(mpi_distribute PRIVATE cxx_std_20)
+    target_include_directories(mpi_distribute PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include
+    )
     target_compile_definitions(mpi_distribute PRIVATE
         ALGEBRA_ASSIGNMENT_SIZE=${ALGEBRA_ASSIGNMENT_SIZE}
     )

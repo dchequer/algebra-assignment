@@ -11,16 +11,18 @@
 #include <utility>
 #include <vector>
 
+#include "assignment_types.hpp"
+
 namespace {
 
-using Field = algebra::FiniteField<11, 3>;
-using Element = Field::Element;
+using Field = assignment::Field;
+using Element = assignment::Element;
 constexpr std::size_t dimension = ALGEBRA_ASSIGNMENT_SIZE;
 constexpr std::uint32_t seed = 123456u;
 
-using Row = std::vector<Element>;
-using Matrix = std::vector<Row>;
-using LocalRows = std::vector<std::pair<std::size_t, Row>>;
+using Row = assignment::Row;
+using Matrix = assignment::Matrix;
+using LocalRows = assignment::LocalRows;
 
 }  // namespace
 

@@ -9,12 +9,14 @@
 #include <random>
 #include <stdexcept>
 
+#include "assignment_types.hpp"
 #include "determinant.hpp"
+#include "generator.hpp"
 
 namespace {
 
-using Field = algebra::FiniteField<11, 3>;
-using Element = Field::Element;
+using Field = assignment::Field;
+using Element = assignment::Element;
 constexpr std::size_t dimension = ALGEBRA_ASSIGNMENT_SIZE;
 constexpr std::uint32_t seed = 123456u;
 using Matrix = algebra::Matrix<Element, dimension, dimension>;
@@ -27,35 +29,12 @@ double seconds(Clock::time_point start) {
     return std::chrono::duration<double>(Clock::now() - start).count();
 }
 
-std::uint32_t draw_coefficient(std::mt19937& generator, std::uint32_t prime) {
-    if (prime < 2) {
-        throw std::invalid_argument("The prime must be at least two");
-    }
-    constexpr std::uint64_t range = std::uint64_t{1} << 32;
-    const std::uint64_t limit = range - range % prime;
-    for (;;) {
-        const std::uint64_t value = generator();
-        if (value < limit) {
-            return static_cast<std::uint32_t>(value % prime);
-        }
-    }
-}
-
-Element next_element(std::mt19937& generator) {
-    Element::polynomial_type polynomial;
-    for (std::size_t degree = 0; degree < Field::extension_degree; ++degree) {
-        const auto coefficient = draw_coefficient(generator, Field::characteristic);
-        polynomial.set_coefficient(degree, Element::coefficient_type::from_integer(coefficient));
-    }
-    return Element::from_polynomial(polynomial);
-}
-
 void populate(Matrix& a, Matrix& b) {
     std::mt19937 generator(seed);
     for (std::size_t i = 0; i < dimension; ++i) {
         for (std::size_t j = 0; j < dimension; ++j) {
-            a(i, j) = next_element(generator);
-            b(i, j) = next_element(generator);
+            a(i, j) = matrix_generation::next_element(generator);
+            b(i, j) = matrix_generation::next_element(generator);
         }
     }
 }

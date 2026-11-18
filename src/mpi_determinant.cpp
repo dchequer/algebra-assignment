@@ -4,198 +4,39 @@
 #include <algebra/finite_fields/finite_fields.hpp>
 #include <algebra/matrices/matrices.hpp>
 #include <cerrno>
+#include <chrono>
 #include <cmath>
 #include <cstdint>
 #include <cstdio>
 #include <cstdlib>
+#include <iomanip>
+#include <iostream>
+#include <random>
 #include <utility>
 #include <vector>
 
+#include "assignment_types.hpp"
 #include "determinant.hpp"
+#include "distributed_determinant.hpp"
+#include "generator.hpp"
 
 namespace {
 
-using Field = algebra::FiniteField<11, 3>;
-using Element = Field::Element;
+using Field = algebra::distributed::Field;
+using Element = algebra::distributed::Element;
 constexpr std::size_t dimension = ALGEBRA_ASSIGNMENT_SIZE;
 constexpr std::uint32_t seed = 123456u;
 
-using Row = std::vector<Element>;
-using Matrix = std::vector<Row>;
-using LocalRows = std::vector<std::pair<std::size_t, Row>>;
+using Row = assignment::Row;
+using Matrix = assignment::Matrix;
+using LocalRows = assignment::LocalRows;
 
-int find_pivot(const LocalRows& local_rows, std::size_t column) {
-    // 1. Start with "no candidate" for this rank.
-    //    Use dimension as the sentinel: valid row numbers are 0..dimension-1.
-    int pivot = static_cast<int>(dimension);
-
-    // 2. Examine each (global_row, row) in local_rows.
-    //    Only consider rows where global_row >= column.
-    //    If row[column] is nonzero, keep the smallest qualifying global row.
-    for (const auto& [global_row, row] : local_rows) {
-        if (global_row >= column && !row[column].is_zero()) {
-            // if first candidate (pivot == dimension) or smaller than current candidate, update pivot
-            if (pivot == static_cast<int>(dimension) || global_row < static_cast<std::size_t>(pivot)) {
-                pivot = static_cast<int>(global_row);
-            }
-        }
-    }
-
-    // 3. Use MPI_Allreduce with MPI_MIN to find the smallest candidate
-    //    across all ranks. Every rank receives the same result.
-    MPI_Allreduce(MPI_IN_PLACE, &pivot, 1, MPI_INT, MPI_MIN, MPI_COMM_WORLD);
-
-    // 4. Return that global result.
-    return pivot;
-}
-
-void swap_distributed_rows(LocalRows& local_rows, std::size_t first_row, std::size_t second_row, int rank, int size) {
-    // Pseudocode:
-    //
-    // If first_row == second_row, return: there is nothing to swap
-    //
-    // first_owner  = first_row % size
-    // second_owner = second_row % size
-    //
-    // If both rows have the same owner:
-    //     Only that owner finds both rows in local_rows
-    //     Swap their Row contents, keeping global row numbers unchanged
-    //
-    // Otherwise:
-    //     Only the two owner ranks participate:
-    //         Find the row this rank owns.
-    //         Encode its Elements into a uint16_t send buffer
-    //         Exchange buffers with the other owner using MPI_Sendrecv
-    //         Decode the received IDs into the existing Row
-    //
-    // Other ranks do nothing
-
-    if (first_row == second_row) {
-        return;
-    }
-
-    const int first_owner = static_cast<int>(first_row % size);
-    const int second_owner = static_cast<int>(second_row % size);
-
-    if (first_owner == second_owner) {
-        if (rank == first_owner) {
-            Row* first_ptr = nullptr;
-            Row* second_ptr = nullptr;
-            for (auto& [global_row, row] : local_rows) {
-                if (global_row == first_row) {
-                    first_ptr = &row;
-                } else if (global_row == second_row) {
-                    second_ptr = &row;
-                }
-            }
-            if (!first_ptr || !second_ptr) {
-                throw std::logic_error("swap_distributed_rows: owner rank does not have both rows");
-            }
-            std::swap(*first_ptr, *second_ptr);
-        }
-    } else {
-        if (rank == first_owner || rank == second_owner) {
-            std::vector<uint16_t> send_buffer(dimension);
-            std::vector<uint16_t> recv_buffer(dimension);
-
-            // find the row this rank owns
-            Row* owned_row = nullptr;
-            for (auto& [global_row, row] : local_rows) {
-                if ((rank == first_owner && global_row == first_row) ||
-                    (rank == second_owner && global_row == second_row)) {
-                    owned_row = &row;
-                    break;
-                }
-            }
-            if (!owned_row) {
-                throw std::logic_error("swap_distributed_rows: owner rank does not have its owned row");
-            }
-
-            // encode the Elements into send_buffer
-            for (std::size_t col = 0; col < dimension; ++col) {
-                send_buffer[col] = static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>((*owned_row)[col]));
-            }
-
-            // exchange buffers with the other owner using MPI_Sendrecv
-            MPI_Sendrecv(
-                send_buffer.data(), static_cast<int>(dimension), MPI_UINT16_T, (rank == first_owner ? second_owner : first_owner), 0,
-                recv_buffer.data(), static_cast<int>(dimension), MPI_UINT16_T, (rank == first_owner ? second_owner : first_owner), 0,
-                MPI_COMM_WORLD, MPI_STATUS_IGNORE);
-
-            // decode the received IDs into the existing Row
-            for (std::size_t col = 0; col < dimension; ++col) {
-                (*owned_row)[col] = Element::from_index(recv_buffer[col]);
-            }
-        }
-    }
-}
-
-Row broadcast_pivot_row(
-    const LocalRows& local_rows,
-    std::size_t pivot_position,
-    int rank,
-    int size) {
-    // owner = pivot_position % size
-    const int owner = static_cast<int>(pivot_position % size);
-
-    // Create a uint16_t buffer with dimension entries on EVERY rank
-    std::vector<uint16_t> buffer(dimension);
-
-    // If this rank is the owner:
-    //     Find pivot_position in local_rows
-    //     Encode each Element in that row into the buffer
-    if (rank == owner) {
-        const Row* pivot_row_ptr = nullptr;
-        for (const auto& [global_row, row] : local_rows) {
-            if (global_row == pivot_position) {
-                pivot_row_ptr = &row;
-                break;
-            }
-        }
-        if (!pivot_row_ptr) {
-            throw std::logic_error("broadcast_pivot_row: owner rank does not have the pivot row");
-        }
-        for (std::size_t col = 0; col < dimension; ++col) {
-            buffer[col] = static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>((*pivot_row_ptr)[col]));
-        }
-    }
-
-    // Every rank calls MPI_Bcast on the buffer
-    // The owner is the broadcast root
-    MPI_Bcast(
-        buffer.data(),
-        static_cast<int>(dimension),
-        MPI_UINT16_T,
-        owner,
-        MPI_COMM_WORLD);
-
-    // On every rank:
-    //     Decode the received IDs into a Row of Elements
-    //     Return that Row
-    Row pivot_row;
-    for (std::size_t col = 0; col < dimension; ++col) {
-        pivot_row.push_back(Element::from_index(buffer[col]));
-    }
-    return pivot_row;
-}
-
-void eliminate_local_rows(LocalRows& local_rows, const Row& pivot_row, std::size_t pivot_position) {
-    // For each (global_row, row) in local_rows:
-    //     If global_row > pivot_position and row[pivot_position] is nonzero:
-    //         Compute multiplier = row[pivot_position] / pivot_row[pivot_position]
-    //         Set row[pivot_position] = 0
-    //         For each column j > pivot_position:
-    //             row[j] = row[j] - multiplier * pivot_row[j]
-    const Element pivot_reciprocal = pivot_row[pivot_position].reciprocal();
-
-    for (auto& [global_row, row] : local_rows) {
-        if (global_row > pivot_position && !row[pivot_position].is_zero()) {
-            const Element multiplier = row[pivot_position].multiply(pivot_reciprocal);
-            row[pivot_position] = Element::zero();
-            for (std::size_t j = pivot_position + 1; j < dimension; ++j) {
-                const Element correction = multiplier.multiply(pivot_row[j]);
-                row[j] = row[j].add(correction.negate());
-            }
+void populate(Matrix& m) {
+    std::mt19937 generator(seed);
+    for (std::size_t r = 0; r < dimension; ++r) {
+        for (std::size_t c = 0; c < dimension; ++c) {
+            m[r][c] = matrix_generation::next_element(generator);
+            (void)matrix_generation::next_element(generator);  // discard
         }
     }
 }
@@ -217,21 +58,19 @@ int main(int argc, char** argv) {
     Element sequential_result = Element::zero();
 
     if (rank == 0) {
-        // Lower-triangular fixture: at dimension 4 its determinant is 4 in GF(11^3).
+        std::cout << std::fixed << std::setprecision(6)
+                  << "Matrix dimension " << dimension << '\n'
+                  << "Seed " << seed << '\n'
+                  << "Field order " << Field::cardinality() << '\n'
+                  << "Modulus " << Field::modulus() << '\n'
+                  << "MPI ranks " << size << '\n'
+                  << "Generating A and checking sequential determinant\n"
+                  << std::flush;
+
         Matrix matrix(dimension, Row(dimension));
-        for (std::size_t r = 0; r < dimension; ++r) {
-            for (std::size_t c = 0; c < dimension; ++c) {
-                matrix[r][c] = Element::zero();
-                if (r == c) {
-                    matrix[r][c] = Element::from_integer(static_cast<std::int64_t>(r % 3 + 2));
-                } else if (r == c + 1) {
-                    matrix[r][c] = Element::one();
-                }
-            }
-        }
+        populate(matrix);
 
         algebra::Matrix<Element, dimension, dimension> reference_matrix;
-
         for (std::size_t r = 0; r < dimension; ++r) {
             for (std::size_t c = 0; c < dimension; ++c) {
                 reference_matrix(r, c) = matrix[r][c];
@@ -283,92 +122,45 @@ int main(int argc, char** argv) {
             local_rows.emplace_back(global_row, std::move(decoded_row));
         }
     }
+    if (rank == 0) {
+        std::cout << "Computing det(A) with MPI\n" << std::flush;
+    }
+    MPI_Barrier(MPI_COMM_WORLD);
+    const double start = MPI_Wtime();
 
-    // const int pivot = find_pivot(local_rows, 0);
+    const Element result = algebra::distributed::distributed_determinant(local_rows, dimension, rank, size);
 
-    // if (pivot == dimension) {
-    //     std::printf("Rank %d | No pivot found for column 0\n", rank);
-    // } else {
-    //     std::printf("Rank %d | Pivot found for column 0: %d\n", rank, pivot);
-    //     std::printf("Rank %d | Swapping global row 0 with global row %d\n", rank, pivot);
-    //     swap_distributed_rows(local_rows, 0, static_cast<std::size_t>(pivot), rank, size);
-    //     Row pivot_row = broadcast_pivot_row(local_rows, 0, rank, size);
+    const double elapsed = MPI_Wtime() - start;
+    double max_elapsed;
+    MPI_Reduce(
+        &elapsed,
+        &max_elapsed,
+        1,
+        MPI_DOUBLE,
+        MPI_MAX,
+        0,
+        MPI_COMM_WORLD);
 
-    //     std::printf("Rank %d | Pivot row for column 0: ", rank);
-    //     for (const auto& element : pivot_row) {
+    if (rank == 0) {
+        std::cout << "det(A) = " << result << '\n'
+                  << "Coefficients [";
+        for (std::size_t degree = 0; degree < Field::extension_degree; ++degree) {
+            if (degree != 0) {
+                std::cout << ", ";
+            }
+            std::cout << result.coefficient(degree);
+        }
+        std::cout << "]\nMPI determinant seconds " << max_elapsed << '\n'
+                  << "Sequential determinant = " << sequential_result << '\n'
+                  << "Determinants match " << std::boolalpha << (result == sequential_result) << '\n';
+    }
+
+    // for (const auto& [global_row, row] : local_rows) {
+    //     std::printf("Rank %d | Global Row %zu:", rank, global_row);
+    //     for (const auto& element : row) {
     //         std::printf(" %u", static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(element)));
     //     }
     //     std::printf("\n");
-
-    //     eliminate_local_rows(local_rows, pivot_row, 0);
-    // }
-
-    Element result = Element::one();
-
-    for (std::size_t k = 0; k < dimension; ++k) {
-        const int pivot = find_pivot(local_rows, k);
-
-        if (pivot == dimension) {
-            std::printf("Rank %d | No pivot found for column %zu\n", rank, k);
-            result = Element::zero();
-            break;
-        }
-
-        if (pivot != static_cast<int>(k)) {
-            std::printf("Rank %d | Swapping global row %zu with global row %d\n", rank, k, pivot);
-            swap_distributed_rows(local_rows, k, static_cast<std::size_t>(pivot), rank, size);
-            result = result.negate();
-        }
-
-        const Row pivot_row = broadcast_pivot_row(local_rows, k, rank, size);
-
-        result = result.multiply(pivot_row[k]);
-
-        eliminate_local_rows(local_rows, pivot_row, k);
-    }
-
-    if (rank == 0) {
-        std::printf("Rank %d | Determinant: %u\n", rank, static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(result)));
-        std::printf("Rank %d | Sequential determinant: %u\n", rank, static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(sequential_result)));
-        if (result == sequential_result) {
-            std::printf("Rank %d | Determinant matches sequential result\n", rank);
-        } else {
-            std::printf("Rank %d | Determinant does NOT match sequential result\n", rank);
-        }
-    }
-
-    for (const auto& [global_row, row] : local_rows) {
-        std::printf("Rank %d | Global Row %zu:", rank, global_row);
-        for (const auto& element : row) {
-            std::printf(" %u", static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(element)));
-        }
-        std::printf("\n");
-    }
-
-    // validate each local row
-    // int local_ok = 1;
-
-    // if (pivot != 1) {
-    //     std::printf("Rank %d | Global pivot for column 0: %d (expected 1)\n", rank, pivot);
-    //     local_ok = 0;
-    // } else {
-    // disabled since we are manually setting pivot and it wont match the expected values
-    // for (const auto& [global_row, row] : local_rows) {
-    //     for (std::size_t col = 0; col < row.size(); ++col) {
-    //         const auto expected = Element::from_coefficients({static_cast<std::int64_t>(global_row),
-    //                                                           static_cast<std::int64_t>(col),
-    //                                                           1});
-    //         if (row[col] != expected) {
-    //             std::printf("Rank %d | Global Row %zu | Column %zu: expected %u, got %u\n",
-    //                         rank,
-    //                         global_row,
-    //                         col,
-    //                         static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(expected)),
-    //                         static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(row[col])));
-    //             local_ok = 0;
-    //         }
-    //     }
-    // }
     // }
 
     MPI_Finalize();
