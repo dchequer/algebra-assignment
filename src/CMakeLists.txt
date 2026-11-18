@@ -41,4 +41,15 @@ if(ALGEBRA_ASSIGNMENT_BUILD_MPI)
         algebra::finite_fields
         algebra::matrices
     )
+
+    add_executable(mpi_determinant mpi_determinant.cpp)
+    target_compile_features(mpi_determinant PRIVATE cxx_std_20)
+    target_compile_definitions(mpi_determinant PRIVATE
+        ALGEBRA_ASSIGNMENT_SIZE=${ALGEBRA_ASSIGNMENT_SIZE}
+    )
+    target_link_libraries(mpi_determinant PRIVATE
+        MPI::MPI_CXX
+        algebra::finite_fields
+        algebra::matrices
+    )
 endif()

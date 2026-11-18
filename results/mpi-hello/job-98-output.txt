@@ -1,0 +1,8 @@
+Hello from process 0 of 3 on demo-dy-workers-1
+Hello from process 1 of 3 on demo-dy-workers-1
+Rank 1 | Global Row 1: 122 133 144 155
+Hello from process 2 of 3 on demo-dy-workers-2
+Rank 0 | Global Row 0: 121 132 143 154
+Rank 0 | Global Row 3: 124 135 146 157
+Rank 2 | Global Row 2: 123 134 145 156
+Distribution PASSED
