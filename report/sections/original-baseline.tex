@@ -2,20 +2,19 @@
 \label{sec:original-baseline}
 
 \subsection{Measurement Procedure}
-The original implementation was measured on \texttt{louie}, a KVM virtual
-machine exposing four logical CPUs with an Intel Core i3-12100F model string
-and approximately 15~GiB of RAM. The application used one sequential process.
+The implementation was developed and small tests were measured on \texttt{louie}, a KVM virtual
+machine exposing four logical CPUs with an Intel Core i3-12100F
+with 16GiB of RAM.
 Compilation used GNU g++ 14.2.0, CMake 3.31.6, and Release flags
-\texttt{-O3 -DNDEBUG -std=gnu++20}. Parallel compilation did not make the
-application execution parallel.
+\texttt{-O3 -DNDEBUG -std=gnu++20}.
 
 The tested square matrix dimensions were $N=64$, $128$, and $256$.
 For each dimension, the executable was configured and built once before
 three separate measured executions. Each execution used seed 123456 and
 the field of order $11^3=1331$, with defining polynomial $x^3+x+4$.
 The build command and the first measurement command used for $N=256$
-are recorded below; the dimension and run number were changed for the
-other measurements.
+are recorded below as an example, other dimensions just substitute 
+the size in the \texttt{-DALGEBRA\_ASSIGNMENT\_SIZE} option and the log file name.
 
 \begingroup
 \scriptsize
@@ -31,21 +30,17 @@ cmake -S . -B build \
 \end{verbatim}
 \endgroup
 
-The timed command enclosed only the executable, so compilation was
-excluded from the reported execution times. The combined output retained
+Only the executable was timed, not the build. The combined output retained
 the field metadata, determinant coefficients, correctness check, application
 phase timings, and GNU Time resource measurements. All nine runs returned
-exit status zero and verified $\det(AB)=\det(A)\det(B)$. At each dimension,
+exit status zero and verified $\det(AB)=\det(A)\det(B)$. For each dimension,
 the determinant coefficients agreed across all three repetitions.
 
 \subsection{Runtime and Peak Memory}
 Table~\ref{tab:original-baseline} reports the median GNU Time elapsed wall
 time, the median application-reported total, and the largest peak resident
-set size among the three repetitions. The application total uses its own
-steady-clock interval, while GNU Time measures process execution; these
-quantities have different boundaries. GNU Time recorded wall time to
-hundredths of a second in these logs. Memory was converted from KiB to MiB
-by dividing by 1024.
+set size among the three repetitions. 
+The application total uses its own steady-clock interval.
 
 \begin{table}[tb]
 \centering
@@ -69,10 +64,10 @@ total by approximately 7.92 times, consistent with the cubic arithmetic
 work of matrix multiplication and elimination.
 
 Table~\ref{tab:original-phases} separates multiplication from the three
-determinant computations. Each timing column is summarized independently;
-its medians need not sum to the median application total.
-At $N=256$, the median of the per-run sums of the three determinant
-times was 4.273438~s, compared with a median product time of 4.418723~s.
+determinant computations. Each timing column is summarized independently.
+For $N=256$, the median combined time for calculating all three 
+determinants was 4.273438 seconds, while matrix multiplication took 4.418723 seconds. 
+This indicates that multiplication took slightly longer than the three determinant calculations combined.
 
 \begin{table}[tb]
 \centering
@@ -91,7 +86,7 @@ $N$ & Product & $\det(A)$ & $\det(B)$ & $\det(C)$ \\
 
 These results establish the original runtime and memory baseline on the
 local host. Per-run measurements, summary statistics, and environment metadata
-are retained in the repository alongside the nine raw logs.
+are retained in the repository alongside the raw logs.
 
 \subsection{Function-Level Profile}
 \label{sec:original-profile}
@@ -117,7 +112,7 @@ Matrix multiplication accounted for 49.71\%, the determinant function for
 35.19\%, and polynomial division/remainder for 12.13\%. The profiler recorded
 50,233,382 calls to the polynomial \texttt{divmod} routine. The small remaining
 shares were attributed to the \texttt{\_init} symbol and random-generator state
-refresh; no further interpretation of \texttt{\_init} is assumed.
+refresh.
 
 \begin{figure}[tb]
 \centering
@@ -127,24 +122,3 @@ $256\times256$ original run. Values describe profiler samples, not wall-time
 fractions; inlined arithmetic is attributed to its enclosing function.}
 \label{fig:original-profile}
 \end{figure}
-
-The attribution must be read alongside the source. GCC can integrate a
-function's code into its callers~\cite{gcc-inline}, so matrix and determinant
-self time can include inlined field arithmetic. In particular, the profile
-lists only one call to the separate field \texttt{multiply} function, whereas
-the matrix multiplication loops request $256^3=16,777,216$ element products at
-source level. The listed count is therefore not a count of all mathematical
-multiplications. Likewise, a zero sampled self time does not establish zero
-cost~\cite{gprof-sampling}.
-
-The report uses 0.01~s samples and accounts for 6.68~s of sampled self time;
-the instrumented application reported 8.854222~s for its total interval.
-These are different measurements. The instrumented run is retained separately
-from the nine ordinary benchmark runs, whose timings remain the performance
-baseline.
-
-The observed volume of polynomial division, together with the field
-implementation's reduction after arithmetic operations, motivates caching
-field results for reuse. This keeps the optimization at the field boundary
-used by both algorithms. The cache's actual benefits still require an
-equivalence-tested implementation and repeated runtime and memory measurements.
