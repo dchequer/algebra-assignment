@@ -11,6 +11,8 @@
 #include <utility>
 #include <vector>
 
+#include "determinant.hpp"
+
 namespace {
 
 using Field = algebra::FiniteField<11, 3>;
@@ -212,19 +214,31 @@ int main(int argc, char** argv) {
     // printf("Hello from process %d of %d on %s\n", rank, size, processor_name);
 
     LocalRows local_rows;
+    Element sequential_result = Element::zero();
 
     if (rank == 0) {
-        // init matrix on rank 0
+        // Lower-triangular fixture: at dimension 4 its determinant is 4 in GF(11^3).
         Matrix matrix(dimension, Row(dimension));
-        for (std::uint16_t r = 0; r < dimension; ++r) {
-            for (std::uint16_t c = 0; c < dimension; ++c) {
-                matrix[r][c] = Element::from_coefficients({r, c, 1});
+        for (std::size_t r = 0; r < dimension; ++r) {
+            for (std::size_t c = 0; c < dimension; ++c) {
+                matrix[r][c] = Element::zero();
+                if (r == c) {
+                    matrix[r][c] = Element::from_integer(static_cast<std::int64_t>(r % 3 + 2));
+                } else if (r == c + 1) {
+                    matrix[r][c] = Element::one();
+                }
             }
         }
 
-        // set pivot for testing manually
-        matrix[0][0] = Element::zero();
-        matrix[1][0] = Element::one();
+        algebra::Matrix<Element, dimension, dimension> reference_matrix;
+
+        for (std::size_t r = 0; r < dimension; ++r) {
+            for (std::size_t c = 0; c < dimension; ++c) {
+                reference_matrix(r, c) = matrix[r][c];
+            }
+        }
+
+        sequential_result = algebra::determinant(reference_matrix);
 
         // distribute rows cyclically (row % size)
         for (std::size_t global_row = 0; global_row < dimension; ++global_row) {
@@ -270,27 +284,57 @@ int main(int argc, char** argv) {
         }
     }
 
-    const int pivot = find_pivot(local_rows, 0);
+    // const int pivot = find_pivot(local_rows, 0);
 
-    if (pivot == dimension) {
-        std::printf("Rank %d | No pivot found for column 0\n", rank);
-    } else {
-        std::printf("Rank %d | Pivot found for column 0: %d\n", rank, pivot);
-        std::printf("Rank %d | Swapping global row 0 with global row %d\n", rank, pivot);
-        swap_distributed_rows(local_rows, 0, static_cast<std::size_t>(pivot), rank, size);
-        Row pivot_row = broadcast_pivot_row(local_rows, 0, rank, size);
+    // if (pivot == dimension) {
+    //     std::printf("Rank %d | No pivot found for column 0\n", rank);
+    // } else {
+    //     std::printf("Rank %d | Pivot found for column 0: %d\n", rank, pivot);
+    //     std::printf("Rank %d | Swapping global row 0 with global row %d\n", rank, pivot);
+    //     swap_distributed_rows(local_rows, 0, static_cast<std::size_t>(pivot), rank, size);
+    //     Row pivot_row = broadcast_pivot_row(local_rows, 0, rank, size);
 
-        std::printf("Rank %d | Pivot row for column 0: ", rank);
-        for (const auto& element : pivot_row) {
-            std::printf(" %u", static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(element)));
+    //     std::printf("Rank %d | Pivot row for column 0: ", rank);
+    //     for (const auto& element : pivot_row) {
+    //         std::printf(" %u", static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(element)));
+    //     }
+    //     std::printf("\n");
+
+    //     eliminate_local_rows(local_rows, pivot_row, 0);
+    // }
+
+    Element result = Element::one();
+
+    for (std::size_t k = 0; k < dimension; ++k) {
+        const int pivot = find_pivot(local_rows, k);
+
+        if (pivot == dimension) {
+            std::printf("Rank %d | No pivot found for column %zu\n", rank, k);
+            result = Element::zero();
+            break;
         }
-        std::printf("\n");
 
-        eliminate_local_rows(local_rows, pivot_row, 0);
+        if (pivot != static_cast<int>(k)) {
+            std::printf("Rank %d | Swapping global row %zu with global row %d\n", rank, k, pivot);
+            swap_distributed_rows(local_rows, k, static_cast<std::size_t>(pivot), rank, size);
+            result = result.negate();
+        }
+
+        const Row pivot_row = broadcast_pivot_row(local_rows, k, rank, size);
+
+        result = result.multiply(pivot_row[k]);
+
+        eliminate_local_rows(local_rows, pivot_row, k);
     }
 
     if (rank == 0) {
-        std::printf("Global pivot for column 0: %d\n", pivot);
+        std::printf("Rank %d | Determinant: %u\n", rank, static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(result)));
+        std::printf("Rank %d | Sequential determinant: %u\n", rank, static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(sequential_result)));
+        if (result == sequential_result) {
+            std::printf("Rank %d | Determinant matches sequential result\n", rank);
+        } else {
+            std::printf("Rank %d | Determinant does NOT match sequential result\n", rank);
+        }
     }
 
     for (const auto& [global_row, row] : local_rows) {
@@ -302,39 +346,31 @@ int main(int argc, char** argv) {
     }
 
     // validate each local row
-    int local_ok = 1;
+    // int local_ok = 1;
 
-    if (pivot != 1) {
-        std::printf("Rank %d | Global pivot for column 0: %d (expected 1)\n", rank, pivot);
-        local_ok = 0;
-    } else {
-        // disabled since we are manually setting pivot and it wont match the expected values
-        // for (const auto& [global_row, row] : local_rows) {
-        //     for (std::size_t col = 0; col < row.size(); ++col) {
-        //         const auto expected = Element::from_coefficients({static_cast<std::int64_t>(global_row),
-        //                                                           static_cast<std::int64_t>(col),
-        //                                                           1});
-        //         if (row[col] != expected) {
-        //             std::printf("Rank %d | Global Row %zu | Column %zu: expected %u, got %u\n",
-        //                         rank,
-        //                         global_row,
-        //                         col,
-        //                         static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(expected)),
-        //                         static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(row[col])));
-        //             local_ok = 0;
-        //         }
-        //     }
-        // }
-    }
-
-    // validate across all ranks
-    int global_ok = 0;
-    MPI_Allreduce(&local_ok, &global_ok, 1, MPI_INT, MPI_LAND, MPI_COMM_WORLD);
-
-    if (rank == 0) {
-        std::printf("Distribution %s\n", global_ok ? "PASSED" : "FAILED");
-    }
+    // if (pivot != 1) {
+    //     std::printf("Rank %d | Global pivot for column 0: %d (expected 1)\n", rank, pivot);
+    //     local_ok = 0;
+    // } else {
+    // disabled since we are manually setting pivot and it wont match the expected values
+    // for (const auto& [global_row, row] : local_rows) {
+    //     for (std::size_t col = 0; col < row.size(); ++col) {
+    //         const auto expected = Element::from_coefficients({static_cast<std::int64_t>(global_row),
+    //                                                           static_cast<std::int64_t>(col),
+    //                                                           1});
+    //         if (row[col] != expected) {
+    //             std::printf("Rank %d | Global Row %zu | Column %zu: expected %u, got %u\n",
+    //                         rank,
+    //                         global_row,
+    //                         col,
+    //                         static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(expected)),
+    //                         static_cast<std::uint16_t>(algebra::detail::cached_fields::encode<Field>(row[col])));
+    //             local_ok = 0;
+    //         }
+    //     }
+    // }
+    // }
 
     MPI_Finalize();
-    return global_ok ? EXIT_SUCCESS : EXIT_FAILURE;
+    return EXIT_SUCCESS;
 }

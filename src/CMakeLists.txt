@@ -52,4 +52,7 @@ if(ALGEBRA_ASSIGNMENT_BUILD_MPI)
         algebra::finite_fields
         algebra::matrices
     )
+    target_include_directories(mpi_determinant PRIVATE
+        ${CMAKE_CURRENT_SOURCE_DIR}/../include
+    )
 endif()
