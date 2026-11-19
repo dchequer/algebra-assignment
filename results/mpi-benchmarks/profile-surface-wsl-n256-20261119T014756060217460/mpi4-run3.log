@@ -1,0 +1,17 @@
+Matrix dimension 256
+Seed 123456
+Field order 1331
+Modulus 4 + 1*x^1 + 1*x^3
+MPI ranks 4
+Cache initialization max seconds 0.004073
+Generating A
+Arithmetic cache entries empty on all ranks before determinant true
+Matrix preparation and distribution max seconds 0.009452
+Computing det(A) with MPI
+Profile rank 0 pivots 256 pivot_seconds 0.027310 swap_seconds 0.000131 broadcast_seconds 0.001260 elimination_seconds 0.249445 addition_misses 956440 multiplication_misses 906361 negation_misses 1331 reciprocal_misses 236
+Profile rank 1 pivots 256 pivot_seconds 0.022903 swap_seconds 0.000141 broadcast_seconds 0.001308 elimination_seconds 0.253759 addition_misses 960608 multiplication_misses 913326 negation_misses 1331 reciprocal_misses 236
+Profile rank 2 pivots 256 pivot_seconds 0.012247 swap_seconds 0.000129 broadcast_seconds 0.001284 elimination_seconds 0.264468 addition_misses 965362 multiplication_misses 913615 negation_misses 1331 reciprocal_misses 236
+Profile rank 3 pivots 256 pivot_seconds 0.017519 swap_seconds 0.000133 broadcast_seconds 0.001341 elimination_seconds 0.259136 addition_misses 967783 multiplication_misses 915881 negation_misses 1331 reciprocal_misses 236
+det(A) = 1 + 1*x^1 + 6*x^2
+Coefficients [1, 1, 6]
+MPI determinant seconds 0.278760
