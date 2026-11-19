@@ -77,4 +77,16 @@ if(ALGEBRA_ASSIGNMENT_BUILD_MPI)
     target_include_directories(mpi_determinant PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/../include
     )
+
+    if(ALGEBRA_ASSIGNMENT_BACKEND STREQUAL "cached")
+        add_executable(mpi_determinant_profile mpi_determinant.cpp)
+        target_compile_features(mpi_determinant_profile PRIVATE cxx_std_20)
+        target_compile_definitions(mpi_determinant_profile PRIVATE
+            ALGEBRA_ASSIGNMENT_SIZE=${ALGEBRA_ASSIGNMENT_SIZE}
+            ALGEBRA_ASSIGNMENT_BENCHMARK_CACHED
+            ALGEBRA_ASSIGNMENT_MPI_PROFILE
+        )
+        target_link_libraries(mpi_determinant_profile PRIVATE MPI::MPI_CXX algebra::finite_fields algebra::matrices)
+        target_include_directories(mpi_determinant_profile PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include)
+    endif()
 endif()

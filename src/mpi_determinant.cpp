@@ -154,7 +154,12 @@ int main(int argc, char** argv) {
     MPI_Barrier(MPI_COMM_WORLD);
     const double start = MPI_Wtime();
 
+#ifdef ALGEBRA_ASSIGNMENT_MPI_PROFILE
+    algebra::distributed::Profile profile;
+    const Element result = algebra::distributed::distributed_determinant(local_rows, dimension, rank, size, profile);
+#else
     const Element result = algebra::distributed::distributed_determinant(local_rows, dimension, rank, size);
+#endif
 
     const double elapsed = MPI_Wtime() - start;
     double max_elapsed;
@@ -166,6 +171,37 @@ int main(int argc, char** argv) {
         MPI_MAX,
         0,
         MPI_COMM_WORLD);
+
+#ifdef ALGEBRA_ASSIGNMENT_MPI_PROFILE
+    const double phase_times[] = {profile.pivot_seconds, profile.swap_seconds,
+                                  profile.broadcast_seconds, profile.elimination_seconds};
+    std::vector<double> all_phase_times(static_cast<std::size_t>(size) * 4);
+    MPI_Gather(phase_times, 4, MPI_DOUBLE, all_phase_times.data(), 4, MPI_DOUBLE, 0, MPI_COMM_WORLD);
+    using OriginalField = algebra::detail::original_fields::FiniteField<Field::characteristic, Field::extension_degree>;
+    const auto& cache = algebra::detail::cached_fields::state_for<OriginalField>();
+    const std::uint64_t counts[] = {static_cast<std::uint64_t>(profile.pivots),
+                                    static_cast<std::uint64_t>(cache.addition_miss_count()),
+                                    static_cast<std::uint64_t>(cache.multiplication_miss_count()),
+                                    static_cast<std::uint64_t>(cache.negation_miss_count()),
+                                    static_cast<std::uint64_t>(cache.reciprocal_miss_count())};
+    std::vector<std::uint64_t> all_counts(static_cast<std::size_t>(size) * 5);
+    MPI_Gather(counts, 5, MPI_UINT64_T, all_counts.data(), 5, MPI_UINT64_T, 0, MPI_COMM_WORLD);
+    if (rank == 0) {
+        for (int i = 0; i < size; ++i) {
+            const auto t = static_cast<std::size_t>(i) * 4;
+            const auto c = static_cast<std::size_t>(i) * 5;
+            std::cout << "Profile rank " << i << " pivots " << all_counts[c]
+                      << " pivot_seconds " << all_phase_times[t]
+                      << " swap_seconds " << all_phase_times[t + 1]
+                      << " broadcast_seconds " << all_phase_times[t + 2]
+                      << " elimination_seconds " << all_phase_times[t + 3]
+                      << " addition_misses " << all_counts[c + 1]
+                      << " multiplication_misses " << all_counts[c + 2]
+                      << " negation_misses " << all_counts[c + 3]
+                      << " reciprocal_misses " << all_counts[c + 4] << '\n';
+        }
+    }
+#endif
 
     if (rank == 0) {
         std::cout << "det(A) = " << result << '\n'

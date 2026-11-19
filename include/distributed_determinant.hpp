@@ -21,6 +21,16 @@ using Element = assignment::Element;
 using Row = assignment::Row;
 using LocalRows = assignment::LocalRows;
 
+#ifdef ALGEBRA_ASSIGNMENT_MPI_PROFILE
+struct Profile {
+    double pivot_seconds = 0;
+    double swap_seconds = 0;
+    double broadcast_seconds = 0;
+    double elimination_seconds = 0;
+    std::size_t pivots = 0;
+};
+#endif
+
 namespace detail {
 
 inline int find_pivot(const LocalRows& local_rows, std::size_t column, std::size_t dimension) {
@@ -202,26 +212,53 @@ inline void eliminate_local_rows(LocalRows& local_rows, const Row& pivot_row, st
 
 }  // namespace detail
 
-inline Element distributed_determinant(LocalRows& local_rows, std::size_t dimension, int rank, int size) {
+inline Element distributed_determinant(LocalRows& local_rows, std::size_t dimension, int rank, int size
+#ifdef ALGEBRA_ASSIGNMENT_MPI_PROFILE
+                                       , Profile& profile
+#endif
+                                       ) {
     Element result = Element::one();
 
     for (std::size_t k = 0; k < dimension; ++k) {
+#ifdef ALGEBRA_ASSIGNMENT_MPI_PROFILE
+        double phase_start = MPI_Wtime();
+#endif
         const int pivot = detail::find_pivot(local_rows, k, dimension);
+#ifdef ALGEBRA_ASSIGNMENT_MPI_PROFILE
+        profile.pivot_seconds += MPI_Wtime() - phase_start;
+#endif
 
         if (pivot == static_cast<int>(dimension)) {
             // std::printf("Rank %d | No pivot found for column %zu\n", rank, k);
             return Element::zero();
         }
 
+#ifdef ALGEBRA_ASSIGNMENT_MPI_PROFILE
+        ++profile.pivots;
+        phase_start = MPI_Wtime();
+#endif
         if (pivot != static_cast<int>(k)) {
             // std::printf("Rank %d | Swapping global row %zu with global row %d\n", rank, k, pivot);
             detail::swap_distributed_rows(local_rows, k, static_cast<std::size_t>(pivot), rank, size, dimension);
             result = result.negate();
         }
 
+#ifdef ALGEBRA_ASSIGNMENT_MPI_PROFILE
+        profile.swap_seconds += MPI_Wtime() - phase_start;
+        phase_start = MPI_Wtime();
+#endif
         const Row pivot_row = detail::broadcast_pivot_row(local_rows, k, rank, size, dimension);
+#ifdef ALGEBRA_ASSIGNMENT_MPI_PROFILE
+        profile.broadcast_seconds += MPI_Wtime() - phase_start;
+#endif
         result = result.multiply(pivot_row[k]);
+#ifdef ALGEBRA_ASSIGNMENT_MPI_PROFILE
+        phase_start = MPI_Wtime();
+#endif
         detail::eliminate_local_rows(local_rows, pivot_row, k, dimension);
+#ifdef ALGEBRA_ASSIGNMENT_MPI_PROFILE
+        profile.elimination_seconds += MPI_Wtime() - phase_start;
+#endif
     }
 
     return result;
