@@ -1,0 +1,77 @@
+\section{MPI Determinant}
+\label{sec:mpi-determinant}
+We implemented distributed elimination for one matrix.
+Rank zero generates the same seeded matrix used by the separate
+cached sequential determinant program. Rows are distributed cyclically by
+global row number ($\text{rank} = \text{row\_number} \bmod \text{number\_of\_ranks}$). 
+For each pivot column, ranks identify the smallest eligible
+nonzero row with an MPI collective, exchange rows when needed, and broadcast
+the pivot row. Each rank then updates its own rows below the pivot. Pivot
+products and row-swap signs determine the result.
+
+We compared the cached sequential determinant against MPI with one, two, and
+four ranks, using dimensions 128, 256, and 512 and seed 123456. Each case used
+three fresh processes per configuration. Each process allocated its arithmetic
+cache before matrix preparation and verified that caches were empty before the algorithm started.
+The measured time includes:
+\begin{itemize}
+    \item For the sequential implementation, the actual determinant call,
+    including destruction of the moved working matrix.
+    \item For MPI, the maximum elapsed time across ranks for the distributed
+    determinant calculation, including:
+    \begin{itemize}
+        \item Pivot collectives
+        \item Row exchanges
+        \item Broadcasts
+        \item Local elimination
+    \end{itemize}
+\end{itemize}
+
+The measured time excludes:
+\begin{itemize}
+    \item Matrix generation
+    \item Matrix distribution
+    \item Cache initialization
+    \item MPI startup
+\end{itemize}
+
+The determinant coefficients agreed between sequential and MPI runs at each
+dimension.
+
+\begin{table}[tb]
+\caption{Local determinant timings and speedups}
+\label{tab:mpi-local}
+\centering
+\begin{tabular}{lrrrr}
+\hline
+Host & $N$ & Seq. (s) & MPI 2 & MPI 4 \\
+\hline
+Louie & 128 & 0.155 & $1.71\times$ & $2.15\times$ \\
+Louie & 256 & 0.492 & $1.13\times$ & $1.50\times$ \\
+Louie & 512 & 0.748 & $1.05\times$ & $1.04\times$ \\
+Surface WSL & 128 & 0.128 & $1.60\times$ & $2.55\times$ \\
+Surface WSL & 256 & 0.411 & $1.17\times$ & $1.39\times$ \\
+Surface WSL & 512 & 0.598 & $1.06\times$ & $1.00\times$ \\
+\hline
+\end{tabular}
+\end{table}
+
+Table~\ref{tab:mpi-local} reports median determinant times and ratios of
+the sequential median to each MPI median. The smallest tested size with a
+speedup above one was 128 for both two and four local ranks on both hosts.
+A separate cluster exercise verified row distribution across workers, 
+but the shared cluster was not readily available at the time of this report.
+This is an area of improvement and we would like to explore the performance 
+of the MPI implementation on a cluster in the future.
+
+To investigate the limited scaling, separate instrumented Surface runs at
+$N=256$ counted operation-cache misses. One rank incurred 1.69 million
+addition and 1.66 million multiplication misses. Across four independent
+rank caches, the totals were 3.85 million and 3.65 million, respectively.
+At $N=512$, every rank filled nearly all $1331^2$ entries of each binary
+operation table, producing approximately four times the one-rank miss totals.
+This shows repeated cache population, it opens the possibility for a more efficient 
+shared cache, and its another possible exploration for future work.
+It begs the questions whether MPI overhead would outweigh the benefit of not having
+to calculate a cache in each rank, or maybe pre-calculating a cache on a first run 
+and loading into each rank on subsequent runs.

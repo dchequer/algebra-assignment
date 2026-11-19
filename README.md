@@ -31,6 +31,19 @@ cmake --build build --parallel
 
 ## Assignment
 
+Guided work plan: [Kanban board](./KANBAN.md).
+
+Cache implementation plan: [Design and checklist](./docs/cache-design.md).
+
+Backend selection: set the CMake cache argument
+`-DALGEBRA_ASSIGNMENT_BACKEND=original` (default) or
+`-DALGEBRA_ASSIGNMENT_BACKEND=cached`, then reconfigure and build through CMake
+Tools. The application keeps the same public headers and link target. Use
+Release mode for timings; changing the backend or matrix dimension requires
+reconfiguration and rebuilding.
+
+Initial local timing and memory comparisons: [Quick backend check](./results/backend-check/README.md).
+
 Work together within your group and use the same IEEE LaTeX template as in the first assignment.
 
 - Use a GitHub Kanban board to assign tasks to each group member. Standalone cards are sufficient.
