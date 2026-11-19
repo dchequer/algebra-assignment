@@ -1,0 +1,25 @@
+
+========================   JOB MAP   ========================
+Data for JOB prterun-surface-wsl-3169@1 offset 0 Total slots allocated 12
+    Mapping policy: BYHWTHREAD:NOOVERSUBSCRIBE  Ranking policy: FILL Binding policy: HWTHREAD:IF-SUPPORTED
+    Cpu set: N/A  PPR: N/A  Cpus-per-rank: N/A  Cpu Type: HWT
+
+
+Data for node: surface-wsl	Num slots: 12	Max slots: 0	Num procs: 1
+        Process jobid: prterun-surface-wsl-3169@1 App: 0 Process rank: 0 Bound: package[0][hwt:0]
+
+=============================================================
+[surface-wsl:03169] Rank 0 bound to package[0][hwt:0]
+Matrix dimension 256
+Seed 123456
+Field order 1331
+Modulus 4 + 1*x^1 + 1*x^3
+MPI ranks 1
+Cache initialization max seconds 0.001967
+Generating A
+Arithmetic cache entries empty on all ranks before determinant true
+Matrix preparation and distribution max seconds 0.016214
+Computing det(A) with MPI
+det(A) = 1 + 1*x^1 + 6*x^2
+Coefficients [1, 1, 6]
+MPI determinant seconds 0.425525

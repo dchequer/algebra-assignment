@@ -1,0 +1,12 @@
+Matrix dimension 128
+Seed 123456
+Field order 1331
+Modulus 4 + 1*x^1 + 1*x^3
+Cache initialization seconds 0.002004
+Generating A
+Matrix preparation seconds 0.001869
+Arithmetic cache entries empty before determinant true
+Computing det(A) sequentially
+det(A) = 3 + 7*x^1 + 4*x^2
+Coefficients [3, 7, 4]
+Sequential determinant seconds 0.127536
