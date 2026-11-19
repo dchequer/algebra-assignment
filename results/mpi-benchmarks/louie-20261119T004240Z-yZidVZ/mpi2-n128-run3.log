@@ -1,0 +1,27 @@
+
+========================   JOB MAP   ========================
+Data for JOB prterun-louie-333434@1 offset 0 Total slots allocated 4
+    Mapping policy: BYHWTHREAD:NOOVERSUBSCRIBE  Ranking policy: FILL Binding policy: HWTHREAD:IF-SUPPORTED
+    Cpu set: N/A  PPR: N/A  Cpus-per-rank: N/A  Cpu Type: HWT
+
+
+Data for node: louie	Num slots: 4	Max slots: 0	Num procs: 2
+        Process jobid: prterun-louie-333434@1 App: 0 Process rank: 0 Bound: package[0][hwt:0]
+        Process jobid: prterun-louie-333434@1 App: 0 Process rank: 1 Bound: package[0][hwt:1]
+
+=============================================================
+[louie:333434] Rank 0 bound to package[0][hwt:0]
+[louie:333434] Rank 1 bound to package[0][hwt:1]
+Matrix dimension 128
+Seed 123456
+Field order 1331
+Modulus 4 + 1*x^1 + 1*x^3
+MPI ranks 2
+Cache initialization max seconds 0.001493
+Generating A
+Arithmetic cache entries empty on all ranks before determinant true
+Matrix preparation and distribution max seconds 0.002400
+Computing det(A) with MPI
+det(A) = 3 + 7*x^1 + 4*x^2
+Coefficients [3, 7, 4]
+MPI determinant seconds 0.095168
