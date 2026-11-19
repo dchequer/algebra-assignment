@@ -16,7 +16,7 @@ cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 # Add a unique suffix so repeated invocations cannot overwrite earlier logs.
 results_dir="results/mpi-benchmarks"
 mkdir -p "$results_dir"
-bench_dir=$(mktemp -d "$results_dir/louie-$(date -u +%Y%m%dT%H%M%SZ)-XXXXXX")
+bench_dir=$(mktemp -d "$results_dir/${HOSTNAME}-$(date -u +%Y%m%dT%H%M%SZ)-XXXXXX")
 
 echo "Configuring for matrix size $n..."
 cmake -S . -B build \
